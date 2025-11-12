@@ -21,11 +21,7 @@ export const TextInput = forwardRef<RNTextInput, TextInputProps>(
         {label && <Text style={styles.label}>{label}</Text>}
         <RNTextInput
           ref={ref}
-          style={[
-            styles.input,
-            error && styles.inputError,
-            style,
-          ]}
+          style={[styles.input, error && styles.inputError, style]}
           placeholderTextColor={colors.text.tertiary}
           {...props}
         />
@@ -41,28 +37,28 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
   },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: 8,
+  error: {
+    color: colors.danger,
+    fontSize: 12,
+    marginTop: 4,
   },
   input: {
-    height: 48,
-    borderWidth: 1,
+    backgroundColor: colors.white,
     borderColor: colors.border,
     borderRadius: 8,
-    paddingHorizontal: 16,
-    fontSize: 16,
+    borderWidth: 1,
     color: colors.text.primary,
-    backgroundColor: colors.white,
+    fontSize: 16,
+    height: 48,
+    paddingHorizontal: 16,
   },
   inputError: {
     borderColor: colors.danger,
   },
-  error: {
-    fontSize: 12,
-    color: colors.danger,
-    marginTop: 4,
+  label: {
+    color: colors.text.primary,
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
   },
 });

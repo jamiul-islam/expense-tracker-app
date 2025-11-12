@@ -17,7 +17,7 @@ interface UserState {
   clearError: () => void;
 }
 
-export const useUserStore = create<UserState>((set) => ({
+export const useUserStore = create<UserState>(set => ({
   user: null,
   isAuthenticated: false,
   isLoading: false,

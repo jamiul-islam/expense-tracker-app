@@ -1,3 +1,3 @@
-export { default as SplashScreen } from './SplashScreen';
-export { default as LoginScreen } from './LoginScreen';
-export { default as SignUpScreen } from './SignUpScreen';
+export { SplashScreen } from './SplashScreen';
+export { EmailInputScreen } from './EmailInputScreen';
+export { OTPVerificationScreen } from './OTPVerificationScreen';

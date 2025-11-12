@@ -13,19 +13,19 @@ export default function DashboardScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: colors.background.primary,
-  },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: 8,
+    flex: 1,
+    justifyContent: 'center',
   },
   subtext: {
-    fontSize: 16,
     color: colors.text.secondary,
+    fontSize: 16,
+  },
+  text: {
+    color: colors.text.primary,
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 8,
   },
 });

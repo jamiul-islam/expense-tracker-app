@@ -1,18 +1,6 @@
 import { supabase } from './supabase';
 import { User } from '@/types/database';
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
-  rememberMe?: boolean;
-}
-
-export interface SignUpCredentials {
-  email: string;
-  password: string;
-  fullName: string;
-}
-
 export interface AuthResponse {
   success: boolean;
   user?: User;
@@ -20,23 +8,59 @@ export interface AuthResponse {
 }
 
 /**
- * AuthService - Handles all authentication operations with Supabase
+ * AuthService - Simplified magic link OTP authentication
  */
 class AuthService {
   /**
-   * Sign in with email and password
+   * Send OTP to email (magic link)
    */
-  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+  async sendOTP(email: string): Promise<{ success: boolean; error?: string }> {
     try {
-      console.log('Login attempt:', { email: credentials.email });
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: credentials.email,
-        password: credentials.password,
+      console.log('Sending OTP to:', email);
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: {
+          shouldCreateUser: true,
+        },
       });
 
       if (error) {
-        console.error('Login error:', error);
+        console.error('Send OTP error:', error);
+        return {
+          success: false,
+          error: error.message,
+        };
+      }
+
+      console.log('OTP sent successfully');
+      return {
+        success: true,
+      };
+    } catch (error) {
+      console.error('Send OTP exception:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to send OTP',
+      };
+    }
+  }
+
+  /**
+   * Verify OTP code
+   */
+  async verifyOTP(email: string, token: string): Promise<AuthResponse> {
+    try {
+      console.log('Verifying OTP for:', email);
+
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token: token.trim(),
+        type: 'email',
+      });
+
+      if (error) {
+        console.error('Verify OTP error:', error);
         return {
           success: false,
           error: error.message,
@@ -46,13 +70,17 @@ class AuthService {
       if (!data.user) {
         return {
           success: false,
-          error: 'No user returned from authentication',
+          error: 'No user returned from verification',
         };
       }
 
-      console.log('Login successful, fetching profile...');
-      
-      // Fetch user profile from database
+      console.log('OTP verified, user ID:', data.user.id);
+      console.log('Session established:', !!data.session);
+
+      // Wait for trigger to create profile
+      await new Promise<void>(resolve => setTimeout(() => resolve(), 1000));
+
+      // Fetch user profile
       const { data: profile, error: profileError } = await supabase
         .from('users')
         .select('*')
@@ -61,112 +89,42 @@ class AuthService {
 
       if (profileError || !profile) {
         console.error('Profile fetch error:', profileError);
-        return {
-          success: false,
-          error: 'Failed to fetch user profile',
-        };
-      }
 
-      console.log('Profile fetched successfully');
-      
-      return {
-        success: true,
-        user: profile as User,
-      };
-    } catch (error) {
-      console.error('Login exception:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Login failed',
-      };
-    }
-  }
+        // Retry once
+        console.log('Retrying profile fetch...');
+        await new Promise<void>(resolve => setTimeout(() => resolve(), 1500));
 
-  /**
-   * Sign up with email, password, and full name
-   */
-  async signUp(credentials: SignUpCredentials): Promise<AuthResponse> {
-    try {
-      console.log('Sign up attempt:', { email: credentials.email, fullName: credentials.fullName });
-      
-      // Create auth user with metadata
-      const { data, error } = await supabase.auth.signUp({
-        email: credentials.email,
-        password: credentials.password,
-        options: {
-          data: {
-            full_name: credentials.fullName,
-          },
-        },
-      });
-
-      if (error) {
-        console.error('Sign up auth error:', error);
-        return {
-          success: false,
-          error: error.message,
-        };
-      }
-
-      if (!data.user) {
-        console.error('No user returned from authentication');
-        return {
-          success: false,
-          error: 'No user returned from authentication',
-        };
-      }
-
-      console.log('Auth user created, ID:', data.user.id);
-      console.log('User profile should be created automatically by trigger');
-
-      // Retry mechanism to fetch profile (trigger may take a moment)
-      let profile = null;
-      let profileError = null;
-      const maxRetries = 5;
-      const retryDelay = 1000; // 1 second between retries
-
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        console.log(`Fetching profile... (attempt ${attempt}/${maxRetries})`);
-        
-        await new Promise<void>((resolve) => {
-          setTimeout(() => resolve(), retryDelay);
-        });
-
-        const result = await supabase
+        const { data: retryProfile, error: retryError } = await supabase
           .from('users')
           .select('*')
           .eq('id', data.user.id)
           .single();
 
-        if (!result.error && result.data) {
-          profile = result.data;
-          console.log('✓ Profile found!');
-          break;
+        if (retryError || !retryProfile) {
+          console.error('Profile fetch retry error:', retryError);
+          return {
+            success: false,
+            error: 'Failed to load user profile',
+          };
         }
 
-        profileError = result.error;
-        console.log(`Profile not ready yet (attempt ${attempt}), retrying...`);
-      }
-
-      if (profileError || !profile) {
-        console.error('Profile fetch error after retries:', profileError);
+        console.log('Profile fetched on retry');
         return {
-          success: false,
-          error: 'Failed to create user profile. Please try logging in.',
+          success: true,
+          user: retryProfile as User,
         };
       }
 
-      console.log('User profile fetched successfully:', profile);
-
+      console.log('Profile fetched successfully');
       return {
         success: true,
         user: profile as User,
       };
     } catch (error) {
-      console.error('Sign up exception:', error);
+      console.error('Verify OTP exception:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Sign up failed',
+        error: error instanceof Error ? error.message : 'Verification failed',
       };
     }
   }
@@ -201,7 +159,10 @@ class AuthService {
    */
   async checkAuthStatus(): Promise<AuthResponse> {
     try {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
 
       if (sessionError || !session) {
         return {
@@ -232,46 +193,6 @@ class AuthService {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Auth check failed',
-      };
-    }
-  }
-
-  /**
-   * Refresh the current session
-   */
-  async refreshToken(): Promise<AuthResponse> {
-    try {
-      const { data: { session }, error } = await supabase.auth.refreshSession();
-
-      if (error || !session) {
-        return {
-          success: false,
-          error: error?.message || 'Failed to refresh session',
-        };
-      }
-
-      // Fetch user profile
-      const { data: profile, error: profileError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-
-      if (profileError || !profile) {
-        return {
-          success: false,
-          error: 'Failed to fetch user profile',
-        };
-      }
-
-      return {
-        success: true,
-        user: profile as User,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Token refresh failed',
       };
     }
   }

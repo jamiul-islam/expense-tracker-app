@@ -29,32 +29,32 @@ export function AppNavigator() {
         },
       }}
     >
-      <Tab.Screen 
-        name="Dashboard" 
+      <Tab.Screen
+        name="Dashboard"
         component={DashboardScreen}
         options={{
           tabBarLabel: 'Dashboard',
           tabBarIcon: () => null, // Will add icons later
         }}
       />
-      <Tab.Screen 
-        name="Transactions" 
+      <Tab.Screen
+        name="Transactions"
         component={TransactionsScreen}
         options={{
           tabBarLabel: 'Transactions',
           tabBarIcon: () => null,
         }}
       />
-      <Tab.Screen 
-        name="Analytics" 
+      <Tab.Screen
+        name="Analytics"
         component={AnalyticsScreen}
         options={{
           tabBarLabel: 'Analytics',
           tabBarIcon: () => null,
         }}
       />
-      <Tab.Screen 
-        name="Profile" 
+      <Tab.Screen
+        name="Profile"
         component={ProfileScreen}
         options={{
           tabBarLabel: 'Profile',

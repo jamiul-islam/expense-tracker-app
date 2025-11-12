@@ -78,7 +78,7 @@ async function testSignup() {
     console.log('');
 
     console.log('=== Step 2: Verifying User Profile (created by trigger) ===');
-    
+
     // Wait for the trigger to create the profile with retry mechanism
     let profile = null;
     let profileError = null;
@@ -87,12 +87,8 @@ async function testSignup() {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       console.log(`Fetching profile... (attempt ${attempt}/${maxRetries})`);
-      
-      const result = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', authData.user.id)
-        .single();
+
+      const result = await supabase.from('users').select('*').eq('id', authData.user.id).single();
 
       if (!result.error && result.data) {
         profile = result.data;
@@ -101,7 +97,7 @@ async function testSignup() {
       }
 
       profileError = result.error;
-      
+
       if (attempt < maxRetries) {
         console.log(`Profile not ready yet, waiting ${retryDelay}ms before retry...`);
         await new Promise(resolve => setTimeout(resolve, retryDelay));
@@ -130,7 +126,6 @@ async function testSignup() {
     console.log('  ID:', profile.id);
     console.log('  Name:', profile.full_name);
     console.log('  Email:', profile.email);
-
   } catch (error) {
     console.error('❌ Unexpected Error:', error);
     console.error('Stack:', error.stack);
@@ -143,7 +138,7 @@ testSignup()
     console.log('\n=== Test Complete ===');
     process.exit(0);
   })
-  .catch((error) => {
+  .catch(error => {
     console.error('\n=== Test Failed ===');
     console.error(error);
     process.exit(1);

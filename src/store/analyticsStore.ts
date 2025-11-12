@@ -30,7 +30,7 @@ interface AnalyticsState {
   updateTimeRange: (range: string) => void;
 }
 
-export const useAnalyticsStore = create<AnalyticsState>((set) => ({
+export const useAnalyticsStore = create<AnalyticsState>(set => ({
   totalIncome: 0,
   totalExpense: 0,
   netBalance: 0,

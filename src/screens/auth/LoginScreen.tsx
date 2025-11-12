@@ -30,7 +30,7 @@ interface FormErrors {
 
 export default function LoginScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const setUser = useUserStore((state) => state.setUser);
+  const setUser = useUserStore(state => state.setUser);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -82,23 +82,21 @@ export default function LoginScreen() {
       });
 
       if (response.success && response.user) {
+        // Set user in store - navigation will handle automatically
         setUser(response.user);
-        
+        console.log('✓ Login successful, user set in store');
+
         if (rememberMe) {
           await storage.setRememberMe(true);
           await storage.setUserId(response.user.id);
         }
-
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'App' }],
-        });
       } else {
         setErrors({
           email: response.error || 'Login failed',
         });
       }
     } catch (error) {
+      console.error('Login error:', error);
       setErrors({
         email: 'An unexpected error occurred',
       });
@@ -112,10 +110,7 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.iconContainer}>
@@ -131,7 +126,7 @@ export default function LoginScreen() {
             label="Email"
             placeholder="Enter your email"
             value={email}
-            onChangeText={(text) => {
+            onChangeText={text => {
               setEmail(text);
               if (errors.email) {
                 setErrors({ ...errors, email: undefined });
@@ -151,7 +146,7 @@ export default function LoginScreen() {
             label="Password"
             placeholder="Enter your password"
             value={password}
-            onChangeText={(text) => {
+            onChangeText={text => {
               setPassword(text);
               if (errors.password) {
                 setErrors({ ...errors, password: undefined });
@@ -192,10 +187,7 @@ export default function LoginScreen() {
           {/* Sign Up Link */}
           <View style={styles.signUpContainer}>
             <Text style={styles.signUpText}>Don't have an account? </Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('SignUp')}
-              disabled={isLoading}
-            >
+            <TouchableOpacity onPress={() => navigation.navigate('SignUp')} disabled={isLoading}>
               <Text style={styles.signUpLink}>Sign Up</Text>
             </TouchableOpacity>
           </View>
@@ -206,97 +198,97 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.white,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 24,
-  },
-  header: {
-    alignItems: 'center',
-    marginTop: 40,
-    marginBottom: 40,
-  },
-  iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  icon: {
-    fontSize: 40,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.text.secondary,
-  },
-  form: {
-    flex: 1,
-  },
-  rememberMeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderRadius: 4,
-    marginRight: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxInner: {
-    width: 12,
-    height: 12,
-    backgroundColor: colors.secondary,
-    borderRadius: 2,
-  },
-  rememberMeText: {
-    fontSize: 14,
-    color: colors.text.primary,
-  },
   button: {
-    height: 48,
+    alignItems: 'center',
     backgroundColor: colors.secondary,
     borderRadius: 8,
-    alignItems: 'center',
+    height: 48,
     justifyContent: 'center',
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
+    color: colors.white,
     fontSize: 16,
     fontWeight: '600',
-    color: colors.white,
+  },
+  checkbox: {
+    alignItems: 'center',
+    borderColor: colors.border,
+    borderRadius: 4,
+    borderWidth: 2,
+    height: 20,
+    justifyContent: 'center',
+    marginRight: 8,
+    width: 20,
+  },
+  checkboxInner: {
+    backgroundColor: colors.secondary,
+    borderRadius: 2,
+    height: 12,
+    width: 12,
+  },
+  container: {
+    backgroundColor: colors.white,
+    flex: 1,
+  },
+  form: {
+    flex: 1,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 40,
+    marginTop: 40,
+  },
+  icon: {
+    fontSize: 40,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    borderRadius: 20,
+    height: 80,
+    justifyContent: 'center',
+    marginBottom: 16,
+    width: 80,
+  },
+  rememberMeContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginBottom: 24,
+  },
+  rememberMeText: {
+    color: colors.text.primary,
+    fontSize: 14,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    padding: 24,
   },
   signUpContainer: {
+    alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
     marginTop: 24,
   },
-  signUpText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-  },
   signUpLink: {
+    color: colors.secondary,
     fontSize: 14,
     fontWeight: '600',
-    color: colors.secondary,
+  },
+  signUpText: {
+    color: colors.text.secondary,
+    fontSize: 14,
+  },
+  subtitle: {
+    color: colors.text.secondary,
+    fontSize: 16,
+  },
+  title: {
+    color: colors.text.primary,
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 8,
   },
 });

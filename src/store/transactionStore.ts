@@ -21,7 +21,9 @@ interface TransactionState {
   isLoading: boolean;
   error: string | null;
   fetchTransactions: (filters?: TransactionFilters) => Promise<void>;
-  addTransaction: (transaction: Omit<Transaction, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  addTransaction: (
+    transaction: Omit<Transaction, 'id' | 'created_at' | 'updated_at'>
+  ) => Promise<void>;
   updateTransaction: (id: string, transaction: Partial<Transaction>) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
   setSelectedTransaction: (transaction: Transaction | null) => void;
@@ -29,7 +31,7 @@ interface TransactionState {
   clearFilters: () => void;
 }
 
-export const useTransactionStore = create<TransactionState>((set) => ({
+export const useTransactionStore = create<TransactionState>(set => ({
   transactions: [],
   selectedTransaction: null,
   filters: {},
@@ -50,7 +52,7 @@ export const useTransactionStore = create<TransactionState>((set) => ({
     }
   },
 
-  addTransaction: async (transaction) => {
+  addTransaction: async transaction => {
     set({ isLoading: true, error: null });
     try {
       // Will be implemented with Supabase API
@@ -78,7 +80,7 @@ export const useTransactionStore = create<TransactionState>((set) => ({
     }
   },
 
-  deleteTransaction: async (id) => {
+  deleteTransaction: async id => {
     set({ isLoading: true, error: null });
     try {
       // Will be implemented with Supabase API
@@ -92,9 +94,9 @@ export const useTransactionStore = create<TransactionState>((set) => ({
     }
   },
 
-  setSelectedTransaction: (transaction) => set({ selectedTransaction: transaction }),
+  setSelectedTransaction: transaction => set({ selectedTransaction: transaction }),
 
-  setFilters: (filters) => set({ filters }),
+  setFilters: filters => set({ filters }),
 
   clearFilters: () => set({ filters: {} }),
 }));
