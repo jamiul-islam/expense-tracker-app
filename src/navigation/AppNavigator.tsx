@@ -1,10 +1,10 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/theme';
 import DashboardScreen from '@/screens/app/DashboardScreen';
 import TransactionsScreen from '@/screens/app/TransactionsScreen';
 import AnalyticsScreen from '@/screens/app/AnalyticsScreen';
-import ProfileScreen from '@/screens/app/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -14,51 +14,52 @@ export function AppNavigator() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.secondary,
-        tabBarInactiveTintColor: colors.text.tertiary,
+        tabBarInactiveTintColor: colors.text.secondary,
         tabBarStyle: {
           backgroundColor: colors.white,
-          borderTopColor: colors.border,
+          borderTopColor: colors.background.secondary,
           borderTopWidth: 1,
+          elevation: 8,
           height: 60,
           paddingBottom: 8,
           paddingTop: 8,
+          shadowColor: '#000',
+          shadowOffset: {
+            height: -2,
+            width: 0,
+          },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: '600',
+          marginTop: 4,
         },
       }}
     >
       <Tab.Screen
-        name="Dashboard"
+        name="Home"
         component={DashboardScreen}
         options={{
-          tabBarLabel: 'Dashboard',
-          tabBarIcon: () => null, // Will add icons later
+          tabBarIcon: ({ color, size }) => <Ionicons name="home" color={color} size={size} />,
+          tabBarLabel: 'Home',
         }}
       />
       <Tab.Screen
         name="Transactions"
         component={TransactionsScreen}
         options={{
+          tabBarIcon: ({ color, size }) => <Ionicons name="list" color={color} size={size} />,
           tabBarLabel: 'Transactions',
-          tabBarIcon: () => null,
         }}
       />
       <Tab.Screen
         name="Analytics"
         component={AnalyticsScreen}
         options={{
+          tabBarIcon: ({ color, size }) => <Ionicons name="bar-chart" color={color} size={size} />,
           tabBarLabel: 'Analytics',
-          tabBarIcon: () => null,
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          tabBarLabel: 'Profile',
-          tabBarIcon: () => null,
         }}
       />
     </Tab.Navigator>

@@ -3,9 +3,16 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { View, StyleSheet, ScrollView, RefreshControl, SafeAreaView } from 'react-native';
 import { colors, spacing } from '@/theme';
-import { ScreenHeader, BalanceCard, DonutChart, LoadingSpinner, Text } from '@/components';
+import {
+  ScreenHeader,
+  BalanceCard,
+  DonutChart,
+  TransactionList,
+  LoadingSpinner,
+  Text,
+} from '@/components';
 import { useUserStore } from '@/store/userStore';
 import { useTransactionStore } from '@/store/transactionStore';
 import type { Transaction } from '@/types/database';
@@ -23,6 +30,16 @@ export default function DashboardScreen() {
     setRefreshing(true);
     await fetchTransactions();
     setRefreshing(false);
+  };
+
+  const handleAvatarPress = () => {
+    // TODO: Navigate to Profile screen or open profile modal
+    console.log('Avatar pressed - open profile');
+  };
+
+  const handleNotificationPress = () => {
+    // TODO: Open notifications
+    console.log('Notification pressed');
   };
 
   // Calculate totals
@@ -86,11 +103,15 @@ export default function DashboardScreen() {
   const recentTransactionSections = groupTransactionsByDate(transactions);
 
   if (isLoading && transactions.length === 0) {
-    return <LoadingSpinner message="Loading dashboard..." />;
+    return (
+      <SafeAreaView style={styles.container}>
+        <LoadingSpinner message="Loading dashboard..." />
+      </SafeAreaView>
+    );
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
@@ -101,6 +122,8 @@ export default function DashboardScreen() {
           userName={user?.full_name || 'User'}
           avatarUrl={user?.avatar_url}
           hasNotification={false}
+          onAvatarPress={handleAvatarPress}
+          onNotificationPress={handleNotificationPress}
         />
 
         {/* Balance Card */}
@@ -115,29 +138,18 @@ export default function DashboardScreen() {
             <Text style={styles.sectionTitle}>Recent Transactions</Text>
           </View>
           {recentTransactionSections.length > 0 ? (
-            <View style={styles.transactionsContainer}>
-              {recentTransactionSections.map(section => (
-                <View key={section.title}>
-                  <Text style={styles.dateHeader}>{section.title}</Text>
-                  {section.data.map(transaction => (
-                    <View key={transaction.id} style={styles.transactionWrapper}>
-                      {/* Transaction item will go here */}
-                      <Text style={styles.transactionText}>
-                        {transaction.title} - ${transaction.amount}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              ))}
-            </View>
+            <TransactionList sections={recentTransactionSections} onTransactionPress={() => {}} />
           ) : (
             <View style={styles.emptyState}>
               <Text style={styles.emptyText}>No recent transactions</Text>
+              <Text style={styles.emptySubtext}>
+                Your transactions will appear here once you add them
+              </Text>
             </View>
           )}
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -146,19 +158,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.primary,
     flex: 1,
   },
-  dateHeader: {
-    color: colors.text.secondary,
-    fontSize: 12,
-    fontWeight: '500',
-    letterSpacing: 1,
-    marginBottom: spacing.sm,
-    marginTop: spacing.md,
-    paddingHorizontal: spacing.lg,
-    textTransform: 'uppercase',
-  },
   emptyState: {
     alignItems: 'center',
     paddingVertical: spacing['3xl'],
+  },
+  emptySubtext: {
+    color: colors.text.tertiary,
+    fontSize: 12,
+    marginTop: spacing.xs,
   },
   emptyText: {
     color: colors.text.secondary,
@@ -176,16 +183,5 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     fontSize: 16,
     fontWeight: '600',
-  },
-  transactionText: {
-    color: colors.text.primary,
-    fontSize: 14,
-  },
-  transactionWrapper: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-  },
-  transactionsContainer: {
-    marginTop: spacing.sm,
   },
 });
