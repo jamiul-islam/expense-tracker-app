@@ -1,46 +1,25 @@
 import React, { useEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { useUserStore } from '@/store';
 import { authService } from '@/services/authService';
 import { colors } from '@/theme';
-import type { NavigationProp } from '@react-navigation/native';
 
-type RootStackParamList = {
-  Login: undefined;
-  App: undefined;
-};
-
-export default function SplashScreen() {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+export function SplashScreen() {
   const setUser = useUserStore((state) => state.setUser);
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Wait minimum 3 seconds for splash screen
-      await new Promise<void>((resolve) => {
-        setTimeout(() => resolve(), 3000);
-      });
-
       // Check authentication status
       const authResponse = await authService.checkAuthStatus();
 
       if (authResponse.success && authResponse.user) {
         setUser(authResponse.user);
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'App' }],
-        });
-      } else {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Login' }],
-        });
       }
+      // If no user, RootNavigator will show EmailInput automatically
     };
 
     checkAuth();
-  }, []);
+  }, [setUser]);
 
   return (
     <View style={styles.container}>
