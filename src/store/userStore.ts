@@ -81,7 +81,7 @@ export const useUserStore = create<UserState>(set => ({
       // Will be implemented in authService
       // Check if session exists
       set({ isLoading: false });
-    } catch (error) {
+    } catch {
       set({
         isLoading: false,
         user: null,

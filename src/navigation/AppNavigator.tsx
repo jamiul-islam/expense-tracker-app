@@ -88,19 +88,12 @@ function TabBarIcon({ focused, color, icon, label }: TabBarIconProps) {
   return (
     <View style={styles.tabItem}>
       <View style={[styles.tabInner, focused && styles.tabInnerActive]}>
-        <Ionicons
-          name={icon}
-          size={20}
-          color={focused ? colors.primary : color}
-        />
+        <Ionicons name={icon} size={20} color={focused ? colors.primary : color} />
         <Text
           numberOfLines={1}
           // adjustsFontSizeToFit
           minimumFontScale={0.95}
-          style={[
-            styles.tabLabel,
-            focused ? styles.tabLabelActive : styles.tabLabelInactive,
-          ]}
+          style={[styles.tabLabel, focused ? styles.tabLabelActive : styles.tabLabelInactive]}
         >
           {label}
         </Text>

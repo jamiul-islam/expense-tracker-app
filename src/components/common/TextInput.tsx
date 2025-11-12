@@ -5,13 +5,14 @@ import {
   Text,
   StyleSheet,
   TextInputProps as RNTextInputProps,
+  ViewStyle,
 } from 'react-native';
 import { colors } from '@/theme';
 
 interface TextInputProps extends RNTextInputProps {
   label?: string;
   error?: string;
-  containerStyle?: any;
+  containerStyle?: ViewStyle;
 }
 
 export const TextInput = forwardRef<RNTextInput, TextInputProps>(

@@ -4,7 +4,7 @@
 
 import { create } from 'zustand';
 import { supabase } from '@/services/supabase';
-import type { Transaction } from '@/types/database';
+import type { Transaction, Database } from '@/types/database';
 
 interface TransactionFilters {
   type?: 'income' | 'expense';
@@ -23,9 +23,12 @@ interface TransactionState {
   error: string | null;
   fetchTransactions: (filters?: TransactionFilters) => Promise<void>;
   addTransaction: (
-    transaction: Omit<Transaction, 'id' | 'created_at' | 'updated_at'>
+    transaction: Database['public']['Tables']['transactions']['Insert']
   ) => Promise<void>;
-  updateTransaction: (id: string, transaction: Partial<Transaction>) => Promise<void>;
+  updateTransaction: (
+    id: string,
+    transaction: Database['public']['Tables']['transactions']['Update']
+  ) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
   setSelectedTransaction: (transaction: Transaction | null) => void;
   setFilters: (filters: TransactionFilters) => void;
@@ -81,10 +84,10 @@ export const useTransactionStore = create<TransactionState>(set => ({
   addTransaction: async transaction => {
     set({ isLoading: true, error: null });
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (
-        supabase.from('transactions').insert([transaction as any]) as any
-      ).select();
+      const { data, error } = await supabase
+        .from('transactions')
+        .insert([transaction as unknown as never])
+        .select();
 
       if (error) throw error;
 
@@ -104,10 +107,9 @@ export const useTransactionStore = create<TransactionState>(set => ({
   updateTransaction: async (id, transaction) => {
     set({ isLoading: true, error: null });
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (
-        supabase.from('transactions').update(transaction as any) as any
-      )
+      const { data, error } = await supabase
+        .from('transactions')
+        .update(transaction as unknown as never)
         .eq('id', id)
         .select();
 
