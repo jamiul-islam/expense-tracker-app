@@ -78,32 +78,46 @@ async function testSignup() {
     console.log('');
 
     console.log('=== Step 2: Verifying User Profile (created by trigger) ===');
-    console.log('Waiting 2 seconds for trigger to complete...');
     
-    // Wait for trigger to complete
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    console.log('Fetching user profile from database...');
+    // Wait for the trigger to create the profile with retry mechanism
+    let profile = null;
+    let profileError = null;
+    const maxRetries = 5;
+    const retryDelay = 1000; // 1 second
 
-    const { data: profile, error: profileError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', authData.user.id)
-      .single();
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      console.log(`Fetching profile... (attempt ${attempt}/${maxRetries})`);
+      
+      const result = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', authData.user.id)
+        .single();
 
-    if (profileError) {
-      console.error('❌ Profile Fetch Error:', profileError);
-      console.error('Error Details:', {
-        message: profileError.message,
-        code: profileError.code,
-        details: profileError.details,
-        hint: profileError.hint,
-      });
-      return;
+      if (!result.error && result.data) {
+        profile = result.data;
+        console.log(`✓ Profile found on attempt ${attempt}!`);
+        break;
+      }
+
+      profileError = result.error;
+      
+      if (attempt < maxRetries) {
+        console.log(`Profile not ready yet, waiting ${retryDelay}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+      }
     }
 
-    if (!profile) {
-      console.error('❌ No profile found in database');
+    if (profileError || !profile) {
+      console.error('❌ Profile Fetch Error after all retries:', profileError);
+      if (profileError) {
+        console.error('Error Details:', {
+          message: profileError.message,
+          code: profileError.code,
+          details: profileError.details,
+          hint: profileError.hint,
+        });
+      }
       return;
     }
 

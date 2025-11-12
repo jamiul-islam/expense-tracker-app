@@ -119,21 +119,40 @@ class AuthService {
       console.log('Auth user created, ID:', data.user.id);
       console.log('User profile should be created automatically by trigger');
 
-      // Wait a moment for the trigger to complete
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Retry mechanism to fetch profile (trigger may take a moment)
+      let profile = null;
+      let profileError = null;
+      const maxRetries = 5;
+      const retryDelay = 1000; // 1 second between retries
 
-      // Fetch the created user profile
-      const { data: profile, error: profileError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        console.log(`Fetching profile... (attempt ${attempt}/${maxRetries})`);
+        
+        await new Promise<void>((resolve) => {
+          setTimeout(() => resolve(), retryDelay);
+        });
+
+        const result = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
+
+        if (!result.error && result.data) {
+          profile = result.data;
+          console.log('✓ Profile found!');
+          break;
+        }
+
+        profileError = result.error;
+        console.log(`Profile not ready yet (attempt ${attempt}), retrying...`);
+      }
 
       if (profileError || !profile) {
-        console.error('Profile fetch error:', profileError);
+        console.error('Profile fetch error after retries:', profileError);
         return {
           success: false,
-          error: 'Failed to create user profile',
+          error: 'Failed to create user profile. Please try logging in.',
         };
       }
 
