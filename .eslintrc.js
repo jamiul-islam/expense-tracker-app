@@ -21,12 +21,18 @@ module.exports = {
     'react/no-unescaped-entities': 'warn',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
-    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+    ],
     '@typescript-eslint/no-require-imports': 'warn',
     'react-native/no-inline-styles': 'warn',
     'react-native/no-color-literals': 'off',
     'react-native/no-raw-text': 'warn',
-    'max-len': ['warn', { code: 120, ignoreStrings: true, ignoreTemplateLiterals: true, ignoreUrls: true }],
+    'max-len': [
+      'warn',
+      { code: 120, ignoreStrings: true, ignoreTemplateLiterals: true, ignoreUrls: true },
+    ],
   },
   settings: {
     react: {

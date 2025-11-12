@@ -17,7 +17,7 @@ class AuthService {
   async sendOTP(email: string): Promise<{ success: boolean; error?: string }> {
     try {
       console.log('Sending OTP to:', email);
-      
+
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: {
@@ -52,7 +52,7 @@ class AuthService {
   async verifyOTP(email: string, token: string): Promise<AuthResponse> {
     try {
       console.log('Verifying OTP for:', email);
-      
+
       const { data, error } = await supabase.auth.verifyOtp({
         email: email.trim(),
         token: token.trim(),
@@ -78,7 +78,7 @@ class AuthService {
       console.log('Session established:', !!data.session);
 
       // Wait for trigger to create profile
-      await new Promise<void>((resolve) => setTimeout(() => resolve(), 1000));
+      await new Promise<void>(resolve => setTimeout(() => resolve(), 1000));
 
       // Fetch user profile
       const { data: profile, error: profileError } = await supabase
@@ -89,17 +89,17 @@ class AuthService {
 
       if (profileError || !profile) {
         console.error('Profile fetch error:', profileError);
-        
+
         // Retry once
         console.log('Retrying profile fetch...');
-        await new Promise<void>((resolve) => setTimeout(() => resolve(), 1500));
-        
+        await new Promise<void>(resolve => setTimeout(() => resolve(), 1500));
+
         const { data: retryProfile, error: retryError } = await supabase
           .from('users')
           .select('*')
           .eq('id', data.user.id)
           .single();
-        
+
         if (retryError || !retryProfile) {
           console.error('Profile fetch retry error:', retryError);
           return {
@@ -107,7 +107,7 @@ class AuthService {
             error: 'Failed to load user profile',
           };
         }
-        
+
         console.log('Profile fetched on retry');
         return {
           success: true,
@@ -159,7 +159,10 @@ class AuthService {
    */
   async checkAuthStatus(): Promise<AuthResponse> {
     try {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
 
       if (sessionError || !session) {
         return {

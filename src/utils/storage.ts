@@ -110,7 +110,7 @@ class Storage {
     try {
       const keys = [STORAGE_KEYS.AUTH_TOKEN, STORAGE_KEYS.REFRESH_TOKEN];
       const values = await AsyncStorage.multiGet(keys);
-      
+
       return {
         authToken: values[0][1],
         refreshToken: values[1][1],

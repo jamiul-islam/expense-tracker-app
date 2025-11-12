@@ -30,7 +30,7 @@ interface FormErrors {
 
 export default function LoginScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const setUser = useUserStore((state) => state.setUser);
+  const setUser = useUserStore(state => state.setUser);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -85,7 +85,7 @@ export default function LoginScreen() {
         // Set user in store - navigation will handle automatically
         setUser(response.user);
         console.log('✓ Login successful, user set in store');
-        
+
         if (rememberMe) {
           await storage.setRememberMe(true);
           await storage.setUserId(response.user.id);
@@ -110,10 +110,7 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.iconContainer}>
@@ -129,7 +126,7 @@ export default function LoginScreen() {
             label="Email"
             placeholder="Enter your email"
             value={email}
-            onChangeText={(text) => {
+            onChangeText={text => {
               setEmail(text);
               if (errors.email) {
                 setErrors({ ...errors, email: undefined });
@@ -149,7 +146,7 @@ export default function LoginScreen() {
             label="Password"
             placeholder="Enter your password"
             value={password}
-            onChangeText={(text) => {
+            onChangeText={text => {
               setPassword(text);
               if (errors.password) {
                 setErrors({ ...errors, password: undefined });
@@ -190,10 +187,7 @@ export default function LoginScreen() {
           {/* Sign Up Link */}
           <View style={styles.signUpContainer}>
             <Text style={styles.signUpText}>Don't have an account? </Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('SignUp')}
-              disabled={isLoading}
-            >
+            <TouchableOpacity onPress={() => navigation.navigate('SignUp')} disabled={isLoading}>
               <Text style={styles.signUpLink}>Sign Up</Text>
             </TouchableOpacity>
           </View>

@@ -79,7 +79,7 @@ export function EmailInputScreen({ navigation }: Props) {
             label="Email Address"
             placeholder="Enter your email"
             value={email}
-            onChangeText={(text) => {
+            onChangeText={text => {
               setEmail(text);
               if (error) setError('');
             }}

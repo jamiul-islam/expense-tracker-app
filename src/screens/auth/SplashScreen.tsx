@@ -5,7 +5,7 @@ import { authService } from '@/services/authService';
 import { colors } from '@/theme';
 
 export function SplashScreen() {
-  const setUser = useUserStore((state) => state.setUser);
+  const setUser = useUserStore(state => state.setUser);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -33,11 +33,7 @@ export function SplashScreen() {
       </View>
 
       {/* Loading Indicator */}
-      <ActivityIndicator 
-        size="large" 
-        color={colors.secondary} 
-        style={styles.loader}
-      />
+      <ActivityIndicator size="large" color={colors.secondary} style={styles.loader} />
     </View>
   );
 }

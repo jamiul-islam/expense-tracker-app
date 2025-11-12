@@ -17,13 +17,13 @@ type Props = NativeStackScreenProps<any, 'OTPVerification'>;
 
 export function OTPVerificationScreen({ navigation, route }: Props) {
   const { email } = route.params as { email: string };
-  const setUser = useUserStore((state) => state.setUser);
-  
+  const setUser = useUserStore(state => state.setUser);
+
   const [otp, setOtp] = useState(['', '', '', '', '', '', '', '']);
   const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
-  
+
   const inputRefs = useRef<Array<TextInput | null>>([]);
 
   const handleOtpChange = (text: string, index: number) => {
@@ -38,7 +38,7 @@ export function OTPVerificationScreen({ navigation, route }: Props) {
       });
       setOtp(newOtp);
       setError('');
-      
+
       // Auto-verify if we have 8 digits
       if (newOtp.every(digit => digit !== '')) {
         handleVerify(newOtp.join(''));
@@ -79,7 +79,7 @@ export function OTPVerificationScreen({ navigation, route }: Props) {
 
   const handleVerify = async (code?: string) => {
     const otpCode = code || otp.join('');
-    
+
     if (otpCode.length !== 8) {
       setError('Please enter all 8 digits');
       return;
@@ -146,15 +146,15 @@ export function OTPVerificationScreen({ navigation, route }: Props) {
           {otp.map((digit, index) => (
             <TextInput
               key={index}
-              ref={(ref) => (inputRefs.current[index] = ref)}
+              ref={ref => (inputRefs.current[index] = ref)}
               style={[
                 styles.otpInput,
                 digit && styles.otpInputFilled,
                 error && styles.otpInputError,
               ]}
               value={digit}
-              onChangeText={(text) => handleOtpChange(text, index)}
-              onKeyPress={(e) => handleKeyPress(e, index)}
+              onChangeText={text => handleOtpChange(text, index)}
+              onKeyPress={e => handleKeyPress(e, index)}
               keyboardType="number-pad"
               maxLength={1}
               selectTextOnFocus
@@ -191,10 +191,7 @@ export function OTPVerificationScreen({ navigation, route }: Props) {
         </View>
 
         {/* Change Email */}
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.changeEmailButton}
-        >
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.changeEmailButton}>
           <Text style={styles.changeEmailText}>Change Email</Text>
         </TouchableOpacity>
       </View>

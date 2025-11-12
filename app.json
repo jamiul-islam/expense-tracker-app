@@ -9,9 +9,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#1A1F4B"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tranzo.app"

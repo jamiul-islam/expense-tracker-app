@@ -1,4 +1,5 @@
 # AGENT.md - Tranzo Project Execution Instructions
+
 **For:** Agentic Coding
 **Project:** Tranzo Financial Dashboard
 
@@ -44,6 +45,7 @@
 ## TECHNOLOGY STACK (STRICTLY ENFORCED)
 
 **Required:**
+
 - ✅ Expo (React Native)
 - ✅ TypeScript (strict mode)
 - ✅ React Navigation v6+
@@ -56,6 +58,7 @@
 - ✅ React Native Gesture Handler
 
 **NOT Allowed:**
+
 - ❌ Redux (use Zustand instead)
 - ❌ Context API for state (use Zustand)
 - ❌ AsyncStorage without encryption
@@ -70,13 +73,16 @@
 ## MCP TOOLS AVAILABLE TO YOU
 
 ### 1. **Figma MCP** - Use for Design Verification
+
 **When to Use:**
+
 - Before implementing a screen → Get design reference
 - When unsure about spacing/colors → Verify exact values
 - To check animation specs → Get precise durations/easing
 - Export component states
 
 **Commands:**
+
 ```
 Use Figma MCP to:
 1. Fetch current frame/component specifications
@@ -92,7 +98,9 @@ Use Figma MCP to:
 ---
 
 ### 2. **Supabase MCP** - Use for Database Operations
+
 **When to Use:**
+
 - Setting up database tables
 - Creating RLS policies
 - Inserting mock data
@@ -100,6 +108,7 @@ Use Figma MCP to:
 - Debugging data fetch issues
 
 **Commands:**
+
 ```
 Use Supabase MCP to:
 1. Create/verify tables (users, transactions, categories)
@@ -116,7 +125,9 @@ Use Supabase MCP to:
 ---
 
 ### 3. **Filesystem MCP** - Use for File Operations
+
 **When to Use:**
+
 - Creating new files/folders
 - Reading existing code
 - Updating configuration files
@@ -124,6 +135,7 @@ Use Supabase MCP to:
 - Creating documentation
 
 **Commands:**
+
 ```
 Use Filesystem MCP to:
 1. Create folder structure
@@ -136,13 +148,16 @@ Use Filesystem MCP to:
 ---
 
 ### 4. **Web Search MCP** - Use Sparingly
+
 **When to Use:**
+
 - Looking up specific React Native library documentation
 - Checking Victory Native chart syntax
 - Finding Supabase specific patterns
 - Verifying TypeScript best practices
 
 **When NOT to Use:**
+
 - Don't search for "how to build financial app" (too broad)
 - Don't search for entire implementations
 
@@ -251,6 +266,7 @@ Use Filesystem MCP to:
 ### DAY 1: Foundation (22 hours)
 
 **Phase 1: Setup (6h)**
+
 - Initialize Expo project
 - Install ALL dependencies at once (don't install incrementally)
 - Setup TypeScript strict mode
@@ -259,6 +275,7 @@ Use Filesystem MCP to:
 - Create folder structure
 
 **Phase 2: Theme & Design (2h)**
+
 - Create all color tokens from Design System Document
 - Create spacing system
 - Create typography presets
@@ -266,6 +283,7 @@ Use Filesystem MCP to:
 - Verify against Figma design
 
 **Phase 3: Supabase Setup (3h)**
+
 - Create database tables
 - Setup RLS policies
 - Insert 50+ mock transactions
@@ -273,6 +291,7 @@ Use Filesystem MCP to:
 - Test connection
 
 **Phase 4: Authentication (8h)**
+
 - Setup Zustand stores (all 4)
 - Create auth service
 - Create Splash screen
@@ -280,6 +299,7 @@ Use Filesystem MCP to:
 - Create navigation structure
 
 **Phase 5: Base Components (2h)**
+
 - Create Button (4 variants)
 - Create Card
 - Create Text presets
@@ -287,6 +307,7 @@ Use Filesystem MCP to:
 - Create Icon wrapper
 
 **Phase 6: Dashboard Start (1h)**
+
 - Create ScreenHeader component
 - Setup HomeScreen structure
 - Test navigation
@@ -296,6 +317,7 @@ Use Filesystem MCP to:
 ### DAY 2: Core Features (20 hours)
 
 **Phase 7: Dashboard Completion (8h)**
+
 - Create BalanceCard with animation
 - Create SummaryCards
 - Create DonutChart (top spending)
@@ -305,6 +327,7 @@ Use Filesystem MCP to:
 - Test with real data from Supabase
 
 **Phase 8: Transactions Screen (7h)**
+
 - Create SearchBar + FilterButton
 - Create FilterModal with all options
 - Create TransactionsScreen with FlatList
@@ -314,6 +337,7 @@ Use Filesystem MCP to:
 - Test filtering and search
 
 **Phase 9: Transaction Management (5h)**
+
 - Create AddTransactionModal
 - Create EditTransactionModal
 - Create DeleteConfirmationModal
@@ -326,6 +350,7 @@ Use Filesystem MCP to:
 ### DAY 3: Analytics, Polish & Submission (18 hours)
 
 **Phase 10: Analytics Screen (5h)**
+
 - Create time filter selector
 - Create summary cards for analytics
 - Create LineChart (spending trend)
@@ -334,6 +359,7 @@ Use Filesystem MCP to:
 - Test data filtering
 
 **Phase 11: State & API Integration (4h)**
+
 - Create API service layer (Supabase queries)
 - Connect stores to API
 - Implement error handling
@@ -341,6 +367,7 @@ Use Filesystem MCP to:
 - Real-time subscriptions
 
 **Phase 12: Animations & Polish (5h)**
+
 - Screen transitions
 - Micro-interactions (button presses)
 - Pull-to-refresh animation
@@ -350,6 +377,7 @@ Use Filesystem MCP to:
 - Test on iOS simulator
 
 **Phase 13: Accessibility & Optimization (2h)**
+
 - Add accessibility labels
 - Test with VoiceOver
 - Optimize performance
@@ -357,6 +385,7 @@ Use Filesystem MCP to:
 - Build production version
 
 **Phase 14: Documentation & Submission (2h)**
+
 - Write comprehensive README.md
 - Add JSDoc comments
 - Verify all commits
@@ -370,6 +399,7 @@ Use Filesystem MCP to:
 ### 1. COLOR SYSTEM IMPLEMENTATION
 
 **File: `src/theme/colors.ts`**
+
 ```typescript
 export const COLORS = {
   primary: '#1A1F4B',
@@ -396,6 +426,7 @@ export const COLORS = {
 ```
 
 **Usage in Components:**
+
 ```typescript
 import { COLORS } from '@/theme/colors';
 
@@ -411,12 +442,7 @@ import { COLORS } from '@/theme/colors';
 
 ```typescript
 // Example: Balance reveal animation
-import Animated, { 
-  FadeInDown, 
-  FadeOutUp,
-  withTiming,
-  Easing 
-} from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeOutUp, withTiming, Easing } from 'react-native-reanimated';
 
 const animatedStyle = useAnimatedStyle(() => ({
   opacity: animationValue.value,
@@ -424,13 +450,10 @@ const animatedStyle = useAnimatedStyle(() => ({
 }));
 
 // On eye icon tap:
-animationValue.value = withTiming(
-  balanceVisible ? 1 : 0,
-  {
-    duration: 300,
-    easing: Easing.out(Easing.cubic),
-  }
-);
+animationValue.value = withTiming(balanceVisible ? 1 : 0, {
+  duration: 300,
+  easing: Easing.out(Easing.cubic),
+});
 ```
 
 ---
@@ -468,7 +491,7 @@ interface TransactionStore {
   filters: FilterState;
   isLoading: boolean;
   error: string | null;
-  
+
   fetchTransactions: (filters?: FilterState) => Promise<void>;
   addTransaction: (data: TransactionInput) => Promise<void>;
   updateTransaction: (id: string, data: Partial<Transaction>) => Promise<void>;
@@ -477,13 +500,13 @@ interface TransactionStore {
   clearFilters: () => void;
 }
 
-export const useTransactionStore = create<TransactionStore>((set) => ({
+export const useTransactionStore = create<TransactionStore>(set => ({
   transactions: [],
   filters: {},
   isLoading: false,
   error: null,
-  
-  fetchTransactions: async (filters) => {
+
+  fetchTransactions: async filters => {
     set({ isLoading: true, error: null });
     try {
       const { data, error } = await supabase
@@ -492,7 +515,7 @@ export const useTransactionStore = create<TransactionStore>((set) => ({
         .eq('user_id', userId)
         // Apply filters
         .order('date', { ascending: false });
-      
+
       if (error) throw error;
       set({ transactions: data });
     } catch (error) {
@@ -549,16 +572,16 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
 // Error boundary for screens
 const withErrorBoundary = (Component) => (props) => {
   const [error, setError] = useState(null);
-  
+
   if (error) {
     return (
-      <ErrorView 
+      <ErrorView
         error={error}
         onRetry={() => setError(null)}
       />
     );
   }
-  
+
   return (
     <ErrorBoundary onError={setError}>
       <Component {...props} />
@@ -624,6 +647,7 @@ const sortedTransactions = useMemo(
 **Format: `[type]([scope]): [description]`**
 
 Examples:
+
 ```
 feat(auth): implement splash screen with auto-navigation
 feat(dashboard): create balance card with animation
@@ -638,6 +662,7 @@ test(auth): add login validation tests
 ```
 
 **Commit Frequency:**
+
 - 1-2 commits per major feature
 - Commits distributed across 3 days (not clustered)
 - Each commit should be logically independent
@@ -703,6 +728,7 @@ EXPO_PUBLIC_API_TIMEOUT=30000
 ```
 
 **.env.example** (commit this, not .env):
+
 ```env
 EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
@@ -714,6 +740,7 @@ EXPO_PUBLIC_APP_ENV=development
 ## IMPORTANT REMINDERS
 
 🔴 **CRITICAL - Do NOT:**
+
 - ❌ Use any deprecated React Native APIs
 - ❌ Hardcode API endpoints or credentials
 - ❌ Use `any` types in TypeScript
@@ -726,6 +753,7 @@ EXPO_PUBLIC_APP_ENV=development
 - ❌ Use localStorage/sessionStorage (use AsyncStorage instead)
 
 🟢 **MUST DO:**
+
 - ✅ Match Figma design pixel-perfectly
 - ✅ Use Zustand for ALL state management
 - ✅ Implement real-time Supabase subscriptions
@@ -742,6 +770,7 @@ EXPO_PUBLIC_APP_ENV=development
 ## AGENT EXECUTION CHECKLIST
 
 ### Pre-Development
+
 - [ ] Read all 4 documents (PRD, Design System, Task Tracker, AGENT.md)
 - [ ] Understand project scope and deadline
 - [ ] Review MCP tools available
@@ -749,6 +778,7 @@ EXPO_PUBLIC_APP_ENV=development
 - [ ] Verify Supabase project credentials
 
 ### Daily Standup
+
 - [ ] Check current time vs deadline
 - [ ] Review task tracker for today's phase
 - [ ] Identify blockers
@@ -756,6 +786,7 @@ EXPO_PUBLIC_APP_ENV=development
 - [ ] Verify git history
 
 ### Code Review (Before Each Commit)
+
 - [ ] TypeScript compiles without errors
 - [ ] ESLint passes
 - [ ] Code matches design specifications
@@ -764,6 +795,7 @@ EXPO_PUBLIC_APP_ENV=development
 - [ ] Commit message is descriptive
 
 ### Pre-Submission
+
 - [ ] 20-25 commits with good distribution
 - [ ] README.md completed
 - [ ] No console.logs in code
@@ -778,6 +810,7 @@ EXPO_PUBLIC_APP_ENV=development
 ## SUCCESS METRICS
 
 ### Code Quality (Must Have)
+
 - ✅ Zero TypeScript errors
 - ✅ ESLint passes with no errors
 - ✅ No `any` types used
@@ -785,6 +818,7 @@ EXPO_PUBLIC_APP_ENV=development
 - ✅ Proper error handling
 
 ### Feature Completeness (Must Have)
+
 - ✅ Authentication flow working
 - ✅ Dashboard shows real data
 - ✅ Transactions CRUD functional
@@ -792,6 +826,7 @@ EXPO_PUBLIC_APP_ENV=development
 - ✅ All navigation flows
 
 ### Design Fidelity (Must Have)
+
 - ✅ Pixel-perfect layout match
 - ✅ Exact colors used
 - ✅ Proper spacing/padding
@@ -799,6 +834,7 @@ EXPO_PUBLIC_APP_ENV=development
 - ✅ Animations smooth
 
 ### Performance (Should Have)
+
 - ✅ App startup < 3 seconds
 - ✅ Navigation < 500ms
 - ✅ Charts render smoothly
@@ -806,6 +842,7 @@ EXPO_PUBLIC_APP_ENV=development
 - ✅ Memory optimized
 
 ### Git History (Must Have)
+
 - ✅ 20-25 commits
 - ✅ Meaningful messages
 - ✅ Even distribution

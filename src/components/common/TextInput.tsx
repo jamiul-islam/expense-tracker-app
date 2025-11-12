@@ -21,11 +21,7 @@ export const TextInput = forwardRef<RNTextInput, TextInputProps>(
         {label && <Text style={styles.label}>{label}</Text>}
         <RNTextInput
           ref={ref}
-          style={[
-            styles.input,
-            error && styles.inputError,
-            style,
-          ]}
+          style={[styles.input, error && styles.inputError, style]}
           placeholderTextColor={colors.text.tertiary}
           {...props}
         />

@@ -31,7 +31,7 @@ interface FormErrors {
 
 export default function SignUpScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const setUser = useUserStore((state) => state.setUser);
+  const setUser = useUserStore(state => state.setUser);
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -121,10 +121,7 @@ export default function SignUpScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.iconContainer}>
@@ -140,7 +137,7 @@ export default function SignUpScreen() {
             label="Full Name"
             placeholder="Enter your full name"
             value={fullName}
-            onChangeText={(text) => {
+            onChangeText={text => {
               setFullName(text);
               if (errors.fullName) {
                 setErrors({ ...errors, fullName: undefined });
@@ -159,7 +156,7 @@ export default function SignUpScreen() {
             label="Email"
             placeholder="Enter your email"
             value={email}
-            onChangeText={(text) => {
+            onChangeText={text => {
               setEmail(text);
               if (errors.email) {
                 setErrors({ ...errors, email: undefined });
@@ -179,7 +176,7 @@ export default function SignUpScreen() {
             label="Password"
             placeholder="Create a password (min 6 characters)"
             value={password}
-            onChangeText={(text) => {
+            onChangeText={text => {
               setPassword(text);
               if (errors.password) {
                 setErrors({ ...errors, password: undefined });
@@ -197,7 +194,7 @@ export default function SignUpScreen() {
             label="Confirm Password"
             placeholder="Re-enter your password"
             value={confirmPassword}
-            onChangeText={(text) => {
+            onChangeText={text => {
               setConfirmPassword(text);
               if (errors.confirmPassword) {
                 setErrors({ ...errors, confirmPassword: undefined });
@@ -226,10 +223,7 @@ export default function SignUpScreen() {
           {/* Login Link */}
           <View style={styles.loginContainer}>
             <Text style={styles.loginText}>Already have an account? </Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Login')}
-              disabled={isLoading}
-            >
+            <TouchableOpacity onPress={() => navigation.navigate('Login')} disabled={isLoading}>
               <Text style={styles.loginLink}>Sign In</Text>
             </TouchableOpacity>
           </View>

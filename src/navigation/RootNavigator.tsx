@@ -9,7 +9,7 @@ const Stack = createStackNavigator();
 
 export function RootNavigator() {
   const [isInitializing, setIsInitializing] = useState(true);
-  const user = useUserStore((state) => state.user);
+  const user = useUserStore(state => state.user);
 
   useEffect(() => {
     // Allow splash screen to show
