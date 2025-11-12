@@ -3,6 +3,7 @@
  */
 
 import { create } from 'zustand';
+import { supabase } from '@/services/supabase';
 import type { Transaction } from '@/types/database';
 
 interface TransactionFilters {
@@ -41,13 +42,38 @@ export const useTransactionStore = create<TransactionState>(set => ({
   fetchTransactions: async (filters?: TransactionFilters) => {
     set({ isLoading: true, error: null });
     try {
-      // Will be implemented with Supabase API
-      console.log('Fetching transactions with filters:', filters);
-      set({ isLoading: false, transactions: [] });
+      let query = supabase.from('transactions').select('*').order('date', { ascending: false });
+
+      // Apply filters
+      if (filters?.type) {
+        query = query.eq('type', filters.type);
+      }
+      if (filters?.category) {
+        query = query.eq('category', filters.category);
+      }
+      if (filters?.dateFrom) {
+        query = query.gte('date', filters.dateFrom);
+      }
+      if (filters?.dateTo) {
+        query = query.lte('date', filters.dateTo);
+      }
+      if (filters?.amountMin !== undefined) {
+        query = query.gte('amount', filters.amountMin);
+      }
+      if (filters?.amountMax !== undefined) {
+        query = query.lte('amount', filters.amountMax);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      set({ isLoading: false, transactions: data || [] });
     } catch (err) {
       set({
         isLoading: false,
         error: err instanceof Error ? err.message : 'Failed to fetch transactions',
+        transactions: [],
       });
     }
   },
@@ -55,9 +81,18 @@ export const useTransactionStore = create<TransactionState>(set => ({
   addTransaction: async transaction => {
     set({ isLoading: true, error: null });
     try {
-      // Will be implemented with Supabase API
-      console.log('Adding transaction:', transaction);
-      set({ isLoading: false });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (
+        supabase.from('transactions').insert([transaction as any]) as any
+      ).select();
+
+      if (error) throw error;
+
+      set(state => ({
+        isLoading: false,
+        transactions:
+          data && data.length > 0 ? [data[0], ...state.transactions] : state.transactions,
+      }));
     } catch (err) {
       set({
         isLoading: false,
@@ -69,9 +104,21 @@ export const useTransactionStore = create<TransactionState>(set => ({
   updateTransaction: async (id, transaction) => {
     set({ isLoading: true, error: null });
     try {
-      // Will be implemented with Supabase API
-      console.log('Updating transaction:', id, transaction);
-      set({ isLoading: false });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (
+        supabase.from('transactions').update(transaction as any) as any
+      )
+        .eq('id', id)
+        .select();
+
+      if (error) throw error;
+
+      set(state => ({
+        isLoading: false,
+        transactions: state.transactions.map(t =>
+          t.id === id && data && data.length > 0 ? data[0] : t
+        ),
+      }));
     } catch (err) {
       set({
         isLoading: false,
@@ -83,9 +130,14 @@ export const useTransactionStore = create<TransactionState>(set => ({
   deleteTransaction: async id => {
     set({ isLoading: true, error: null });
     try {
-      // Will be implemented with Supabase API
-      console.log('Deleting transaction:', id);
-      set({ isLoading: false });
+      const { error } = await supabase.from('transactions').delete().eq('id', id);
+
+      if (error) throw error;
+
+      set(state => ({
+        isLoading: false,
+        transactions: state.transactions.filter(t => t.id !== id),
+      }));
     } catch (err) {
       set({
         isLoading: false,

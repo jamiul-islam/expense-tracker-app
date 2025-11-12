@@ -6,7 +6,9 @@ import colors from './colors';
 import tokens from './tokens';
 import animations from './animations';
 
-export { colors, tokens, animations };
+// Export individual token properties for easier imports
+export { colors, animations };
+export const { spacing, borderRadius, typography, shadows, layout } = tokens;
 
 export const theme = {
   colors,
