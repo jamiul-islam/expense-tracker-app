@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useUserStore } from '@/store';
-import { SplashScreen, LoginScreen, SignUpScreen } from '@/screens/auth';
+import { SplashScreen, EmailInputScreen, OTPVerificationScreen } from '@/screens/auth';
 import { AppNavigator } from './AppNavigator';
 
 const Stack = createStackNavigator();
@@ -29,8 +29,8 @@ export function RootNavigator() {
           <Stack.Screen name="App" component={AppNavigator} />
         ) : (
           <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="SignUp" component={SignUpScreen} />
+            <Stack.Screen name="EmailInput" component={EmailInputScreen} />
+            <Stack.Screen name="OTPVerification" component={OTPVerificationScreen} />
           </>
         )}
       </Stack.Navigator>

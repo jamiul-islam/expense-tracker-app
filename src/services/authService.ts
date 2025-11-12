@@ -1,18 +1,6 @@
 import { supabase } from './supabase';
 import { User } from '@/types/database';
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
-  rememberMe?: boolean;
-}
-
-export interface SignUpCredentials {
-  email: string;
-  password: string;
-  fullName: string;
-}
-
 export interface AuthResponse {
   success: boolean;
   user?: User;
@@ -20,88 +8,59 @@ export interface AuthResponse {
 }
 
 /**
- * AuthService - Handles all authentication operations with Supabase
+ * AuthService - Simplified magic link OTP authentication
  */
 class AuthService {
   /**
-   * Sign in with email and password
+   * Send OTP to email (magic link)
    */
-  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+  async sendOTP(email: string): Promise<{ success: boolean; error?: string }> {
     try {
-      console.log('Login attempt:', { email: credentials.email });
+      console.log('Sending OTP to:', email);
       
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: credentials.email,
-        password: credentials.password,
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: {
+          shouldCreateUser: true,
+        },
       });
 
       if (error) {
-        console.error('Login error:', error);
+        console.error('Send OTP error:', error);
         return {
           success: false,
           error: error.message,
         };
       }
 
-      if (!data.user) {
-        return {
-          success: false,
-          error: 'No user returned from authentication',
-        };
-      }
-
-      console.log('Login successful, fetching profile...');
-      
-      // Fetch user profile from database
-      const { data: profile, error: profileError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
-
-      if (profileError || !profile) {
-        console.error('Profile fetch error:', profileError);
-        return {
-          success: false,
-          error: 'Failed to fetch user profile',
-        };
-      }
-
-      console.log('Profile fetched successfully');
-      
+      console.log('OTP sent successfully');
       return {
         success: true,
-        user: profile as User,
       };
     } catch (error) {
-      console.error('Login exception:', error);
+      console.error('Send OTP exception:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Login failed',
+        error: error instanceof Error ? error.message : 'Failed to send OTP',
       };
     }
   }
 
   /**
-   * Sign up with email, password, and full name
+   * Verify OTP code
    */
-  async signUp(credentials: SignUpCredentials): Promise<AuthResponse> {
+  async verifyOTP(email: string, token: string): Promise<AuthResponse> {
     try {
-      console.log('Sign up attempt:', { email: credentials.email, fullName: credentials.fullName });
+      console.log('Verifying OTP for:', email);
       
-      // Create auth user with metadata (trigger will create profile)
-      const { data, error } = await supabase.auth.signUp({
-        email: credentials.email,
-        password: credentials.password,
-        options: {
-          data: {
-            full_name: credentials.fullName,
-          },
-        },
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token: token.trim(),
+        type: 'email',
       });
 
       if (error) {
-        console.error('Sign up auth error:', error);
+        console.error('Verify OTP error:', error);
         return {
           success: false,
           error: error.message,
@@ -109,31 +68,19 @@ class AuthService {
       }
 
       if (!data.user) {
-        console.error('No user returned from authentication');
         return {
           success: false,
-          error: 'No user returned from authentication',
+          error: 'No user returned from verification',
         };
       }
 
-      console.log('Auth user created, ID:', data.user.id);
+      console.log('OTP verified, user ID:', data.user.id);
       console.log('Session established:', !!data.session);
-      
-      if (!data.session) {
-        console.error('No session returned - email confirmation may be required');
-        return {
-          success: false,
-          error: 'Please check your email to confirm your account',
-        };
-      }
 
-      console.log('Waiting for trigger to create profile...');
-
-      // Wait for trigger to execute and session to propagate
+      // Wait for trigger to create profile
       await new Promise<void>((resolve) => setTimeout(() => resolve(), 1000));
 
-      // Fetch the profile created by trigger
-      // Since we have a valid session, auth.uid() should work now
+      // Fetch user profile
       const { data: profile, error: profileError } = await supabase
         .from('users')
         .select('*')
@@ -142,11 +89,10 @@ class AuthService {
 
       if (profileError || !profile) {
         console.error('Profile fetch error:', profileError);
-        console.log('Session check - user ID:', data.user.id);
         
-        // Retry with longer delay
-        console.log('Retrying profile fetch after longer delay...');
-        await new Promise<void>((resolve) => setTimeout(() => resolve(), 2000));
+        // Retry once
+        console.log('Retrying profile fetch...');
+        await new Promise<void>((resolve) => setTimeout(() => resolve(), 1500));
         
         const { data: retryProfile, error: retryError } = await supabase
           .from('users')
@@ -156,40 +102,9 @@ class AuthService {
         
         if (retryError || !retryProfile) {
           console.error('Profile fetch retry error:', retryError);
-          
-          // Profile exists (trigger created it), but RLS is blocking
-          // This means session propagation is taking too long
-          // Let's try refreshing the session
-          console.log('Attempting to refresh session...');
-          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-          
-          if (refreshError || !refreshData.session) {
-            console.error('Session refresh error:', refreshError);
-            return {
-              success: false,
-              error: 'Account created but unable to sign in. Please try logging in.',
-            };
-          }
-          
-          // Try one more time with refreshed session
-          const { data: finalProfile, error: finalError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', data.user.id)
-            .single();
-          
-          if (finalError || !finalProfile) {
-            console.error('Final profile fetch error:', finalError);
-            return {
-              success: false,
-              error: 'Account created. Please try logging in.',
-            };
-          }
-          
-          console.log('Profile fetched after session refresh');
           return {
-            success: true,
-            user: finalProfile as User,
+            success: false,
+            error: 'Failed to load user profile',
           };
         }
         
@@ -201,16 +116,15 @@ class AuthService {
       }
 
       console.log('Profile fetched successfully');
-
       return {
         success: true,
         user: profile as User,
       };
     } catch (error) {
-      console.error('Sign up exception:', error);
+      console.error('Verify OTP exception:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Sign up failed',
+        error: error instanceof Error ? error.message : 'Verification failed',
       };
     }
   }
@@ -276,46 +190,6 @@ class AuthService {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Auth check failed',
-      };
-    }
-  }
-
-  /**
-   * Refresh the current session
-   */
-  async refreshToken(): Promise<AuthResponse> {
-    try {
-      const { data: { session }, error } = await supabase.auth.refreshSession();
-
-      if (error || !session) {
-        return {
-          success: false,
-          error: error?.message || 'Failed to refresh session',
-        };
-      }
-
-      // Fetch user profile
-      const { data: profile, error: profileError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-
-      if (profileError || !profile) {
-        return {
-          success: false,
-          error: 'Failed to fetch user profile',
-        };
-      }
-
-      return {
-        success: true,
-        user: profile as User,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Token refresh failed',
       };
     }
   }
