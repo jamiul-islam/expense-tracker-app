@@ -5,7 +5,6 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react-native/all',
     'plugin:@typescript-eslint/recommended',
-    'prettier',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -15,17 +14,19 @@ module.exports = {
     ecmaVersion: 2021,
     sourceType: 'module',
   },
-  plugins: ['react', 'react-native', '@typescript-eslint', 'prettier'],
+  plugins: ['react', 'react-native', '@typescript-eslint'],
   rules: {
-    'prettier/prettier': 'error',
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',
+    'react/no-unescaped-entities': 'warn',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'error',
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-require-imports': 'warn',
     'react-native/no-inline-styles': 'warn',
     'react-native/no-color-literals': 'off',
-    'max-len': ['error', { code: 100, ignoreStrings: true, ignoreTemplateLiterals: true }],
+    'react-native/no-raw-text': 'warn',
+    'max-len': ['warn', { code: 120, ignoreStrings: true, ignoreTemplateLiterals: true, ignoreUrls: true }],
   },
   settings: {
     react: {

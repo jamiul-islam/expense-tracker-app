@@ -117,45 +117,6 @@ export function EmailInputScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.white,
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  iconContainer: {
-    alignItems: 'center',
-    backgroundColor: colors.secondary + '20',
-    borderRadius: 40,
-    height: 80,
-    justifyContent: 'center',
-    marginBottom: 20,
-    width: 80,
-  },
-  icon: {
-    fontSize: 40,
-  },
-  title: {
-    color: colors.text.primary,
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  subtitle: {
-    color: colors.text.secondary,
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  form: {
-    marginBottom: 24,
-  },
   button: {
     alignItems: 'center',
     backgroundColor: colors.secondary,
@@ -172,9 +133,48 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
+  container: {
+    backgroundColor: colors.white,
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  form: {
+    marginBottom: 24,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  icon: {
+    fontSize: 40,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    backgroundColor: colors.secondary + '20',
+    borderRadius: 40,
+    height: 80,
+    justifyContent: 'center',
+    marginBottom: 20,
+    width: 80,
+  },
   infoText: {
     color: colors.text.secondary,
     fontSize: 14,
     textAlign: 'center',
+  },
+  subtitle: {
+    color: colors.text.secondary,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  title: {
+    color: colors.text.primary,
+    fontSize: 28,
+    fontWeight: '700',
+    marginBottom: 8,
   },
 });

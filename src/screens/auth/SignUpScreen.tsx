@@ -240,50 +240,11 @@ export default function SignUpScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.white,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 24,
-  },
-  header: {
-    alignItems: 'center',
-    marginTop: 40,
-    marginBottom: 40,
-  },
-  iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  icon: {
-    fontSize: 40,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-  },
-  form: {
-    flex: 1,
-  },
   button: {
-    height: 48,
+    alignItems: 'center',
     backgroundColor: colors.secondary,
     borderRadius: 8,
-    alignItems: 'center',
+    height: 48,
     justifyContent: 'center',
     marginTop: 8,
   },
@@ -291,23 +252,62 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
+    color: colors.white,
     fontSize: 16,
     fontWeight: '600',
-    color: colors.white,
+  },
+  container: {
+    backgroundColor: colors.white,
+    flex: 1,
+  },
+  form: {
+    flex: 1,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 40,
+    marginTop: 40,
+  },
+  icon: {
+    fontSize: 40,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    borderRadius: 20,
+    height: 80,
+    justifyContent: 'center',
+    marginBottom: 16,
+    width: 80,
   },
   loginContainer: {
+    alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
     marginTop: 24,
   },
-  loginText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-  },
   loginLink: {
+    color: colors.secondary,
     fontSize: 14,
     fontWeight: '600',
-    color: colors.secondary,
+  },
+  loginText: {
+    color: colors.text.secondary,
+    fontSize: 14,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    padding: 24,
+  },
+  subtitle: {
+    color: colors.text.secondary,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  title: {
+    color: colors.text.primary,
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 8,
   },
 });

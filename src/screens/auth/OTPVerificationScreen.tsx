@@ -19,7 +19,7 @@ export function OTPVerificationScreen({ navigation, route }: Props) {
   const { email } = route.params as { email: string };
   const setUser = useUserStore((state) => state.setUser);
   
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '', '', '', '', '']);
   const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -27,6 +27,31 @@ export function OTPVerificationScreen({ navigation, route }: Props) {
   const inputRefs = useRef<Array<TextInput | null>>([]);
 
   const handleOtpChange = (text: string, index: number) => {
+    // Handle paste - if multiple characters, split across inputs
+    if (text.length > 1) {
+      const pastedCode = text.slice(0, 8).split('');
+      const newOtp = [...otp];
+      pastedCode.forEach((char, i) => {
+        if (index + i < 8 && /^\d$/.test(char)) {
+          newOtp[index + i] = char;
+        }
+      });
+      setOtp(newOtp);
+      setError('');
+      
+      // Auto-verify if we have 8 digits
+      if (newOtp.every(digit => digit !== '')) {
+        handleVerify(newOtp.join(''));
+      } else {
+        // Focus on next empty input
+        const nextEmpty = newOtp.findIndex(digit => digit === '');
+        if (nextEmpty !== -1 && nextEmpty < 8) {
+          inputRefs.current[nextEmpty]?.focus();
+        }
+      }
+      return;
+    }
+
     // Only allow numbers
     if (text && !/^\d$/.test(text)) return;
 
@@ -36,12 +61,12 @@ export function OTPVerificationScreen({ navigation, route }: Props) {
     setError('');
 
     // Auto-focus next input
-    if (text && index < 5) {
+    if (text && index < 7) {
       inputRefs.current[index + 1]?.focus();
     }
 
     // Auto-verify when all digits entered
-    if (text && index === 5 && newOtp.every(digit => digit !== '')) {
+    if (text && index === 7 && newOtp.every(digit => digit !== '')) {
       handleVerify(newOtp.join(''));
     }
   };
@@ -55,8 +80,8 @@ export function OTPVerificationScreen({ navigation, route }: Props) {
   const handleVerify = async (code?: string) => {
     const otpCode = code || otp.join('');
     
-    if (otpCode.length !== 6) {
-      setError('Please enter all 6 digits');
+    if (otpCode.length !== 8) {
+      setError('Please enter all 8 digits');
       return;
     }
 
@@ -89,7 +114,7 @@ export function OTPVerificationScreen({ navigation, route }: Props) {
 
       if (response.success) {
         Alert.alert('Success', 'Verification code sent!');
-        setOtp(['', '', '', '', '', '']);
+        setOtp(['', '', '', '', '', '', '', '']);
         inputRefs.current[0]?.focus();
       } else {
         setError(response.error || 'Failed to resend code');
@@ -111,7 +136,7 @@ export function OTPVerificationScreen({ navigation, route }: Props) {
           </View>
           <Text style={styles.title}>Verify Your Email</Text>
           <Text style={styles.subtitle}>
-            We sent a 6-digit code to{'\n'}
+            We sent an 8-digit code to{'\n'}
             <Text style={styles.email}>{email}</Text>
           </Text>
         </View>
@@ -178,76 +203,6 @@ export function OTPVerificationScreen({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.white,
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  iconContainer: {
-    alignItems: 'center',
-    backgroundColor: colors.secondary + '20',
-    borderRadius: 40,
-    height: 80,
-    justifyContent: 'center',
-    marginBottom: 20,
-    width: 80,
-  },
-  icon: {
-    fontSize: 40,
-  },
-  title: {
-    color: colors.text.primary,
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  subtitle: {
-    color: colors.text.secondary,
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  email: {
-    color: colors.secondary,
-    fontWeight: '600',
-  },
-  otpContainer: {
-    flexDirection: 'row',
-    gap: 12,
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  otpInput: {
-    backgroundColor: colors.background,
-    borderColor: colors.border,
-    borderRadius: 12,
-    borderWidth: 2,
-    color: colors.text.primary,
-    fontSize: 24,
-    fontWeight: '600',
-    height: 56,
-    textAlign: 'center',
-    width: 48,
-  },
-  otpInputFilled: {
-    borderColor: colors.secondary,
-  },
-  otpInputError: {
-    borderColor: colors.error,
-  },
-  errorText: {
-    color: colors.error,
-    fontSize: 14,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
   button: {
     alignItems: 'center',
     backgroundColor: colors.secondary,
@@ -264,15 +219,79 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
+  changeEmailButton: {
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  changeEmailText: {
+    color: colors.text.secondary,
+    fontSize: 14,
+    textDecorationLine: 'underline',
+  },
+  container: {
+    backgroundColor: colors.white,
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  email: {
+    color: colors.secondary,
+    fontWeight: '600',
+  },
+  errorText: {
+    color: colors.error,
+    fontSize: 14,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  icon: {
+    fontSize: 40,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    backgroundColor: colors.secondary + '20',
+    borderRadius: 40,
+    height: 80,
+    justifyContent: 'center',
+    marginBottom: 20,
+    width: 80,
+  },
+  otpContainer: {
+    flexDirection: 'row',
+    gap: 4,
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  otpInput: {
+    backgroundColor: colors.background,
+    borderColor: colors.border,
+    borderRadius: 12,
+    borderWidth: 2,
+    color: colors.text.primary,
+    fontSize: 24,
+    fontWeight: '600',
+    height: 56,
+    textAlign: 'center',
+    width: 42,
+  },
+  otpInputError: {
+    borderColor: colors.error,
+  },
+  otpInputFilled: {
+    borderColor: colors.secondary,
+  },
   resendContainer: {
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
     marginBottom: 16,
-  },
-  resendText: {
-    color: colors.text.secondary,
-    fontSize: 14,
   },
   resendLink: {
     color: colors.secondary,
@@ -282,13 +301,19 @@ const styles = StyleSheet.create({
   resendLinkDisabled: {
     opacity: 0.5,
   },
-  changeEmailButton: {
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  changeEmailText: {
+  resendText: {
     color: colors.text.secondary,
     fontSize: 14,
-    textDecorationLine: 'underline',
+  },
+  subtitle: {
+    color: colors.text.secondary,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  title: {
+    color: colors.text.primary,
+    fontSize: 28,
+    fontWeight: '700',
+    marginBottom: 8,
   },
 });

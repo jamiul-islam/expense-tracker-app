@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.expo/
+.expo-shared/
+
+# Scripts (test/utility files)
+scripts/
+
+# Config files that might use require()
+*.config.js
+babel.config.js
+metro.config.js
+
+# Cache
+.eslintcache

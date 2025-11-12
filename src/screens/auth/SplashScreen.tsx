@@ -44,38 +44,38 @@ export function SplashScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: colors.white,
+    flex: 1,
+    justifyContent: 'center',
+  },
+  icon: {
+    fontSize: 60,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    borderRadius: 24,
+    height: 128,
+    justifyContent: 'center',
+    marginBottom: 16,
+    width: 128,
+  },
+  loader: {
+    marginTop: 32,
   },
   logoContainer: {
     alignItems: 'center',
     marginBottom: 32,
   },
-  iconContainer: {
-    width: 128,
-    height: 128,
-    borderRadius: 24,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  icon: {
-    fontSize: 60,
+  subtitle: {
+    color: colors.text.secondary,
+    fontSize: 18,
   },
   title: {
+    color: colors.text.primary,
     fontSize: 36,
     fontWeight: 'bold',
-    color: colors.text.primary,
     marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: colors.text.secondary,
-  },
-  loader: {
-    marginTop: 32,
   },
 });
