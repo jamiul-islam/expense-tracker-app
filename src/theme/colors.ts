@@ -22,6 +22,8 @@ export const colors = {
     secondary: '#52515D', // Text grey from Figma
     tertiary: '#6A697A', // Inactive text from Figma
     light: '#9CA3AF',
+    percentage: '#565E7F', // Percentage text color from Figma
+    dailyTotal: '#8B8E99', // Daily total grey from Figma
   },
 
   // Background Colors

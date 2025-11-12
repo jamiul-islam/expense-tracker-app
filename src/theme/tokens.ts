@@ -14,22 +14,23 @@ export const spacing = {
   '3xl': 32,
 };
 
-// Border Radius
+// Border Radius (Figma-based)
 export const borderRadius = {
   none: 0,
   sm: 8,
-  md: 12,
-  lg: 16,
+  md: 10, // Summary boxes (Figma)
+  lg: 20, // Cards (Figma)
+  pill: 40, // Active tab (Figma)
   full: 999,
 };
 
-// Typography
+// Typography (Figma-based: Inter Display)
 export const typography = {
   fontFamily: {
-    regular: 'System',
-    medium: 'System',
-    semibold: 'System',
-    bold: 'System',
+    regular: 'Inter Display',
+    medium: 'Inter Display',
+    semibold: 'Inter Display',
+    bold: 'Inter Display',
   },
   fontSize: {
     xs: 12,
@@ -39,7 +40,7 @@ export const typography = {
     xl: 20,
     '2xl': 24,
     '3xl': 28,
-    '4xl': 32,
+    '4xl': 30, // Updated from Figma (balance amount)
   },
   fontWeight: {
     regular: '400' as const,
@@ -59,7 +60,7 @@ export const typography = {
   },
 };
 
-// Shadows (React Native)
+// Shadows (React Native - Figma-based)
 export const shadows = {
   none: {
     shadowColor: '#000',
@@ -67,6 +68,30 @@ export const shadows = {
     shadowOpacity: 0,
     shadowRadius: 0,
     elevation: 0,
+  },
+  card: {
+    // Figma: 0px 4px 6px rgba(23,37,81,0.07)
+    shadowColor: '#172551',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  summaryBox: {
+    // Figma: 0px 1px 0px rgba(30,44,64,0.05)
+    shadowColor: '#1E2C40',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 0,
+    elevation: 1,
+  },
+  bottomNav: {
+    // Figma: 0px 1px 4px rgba(15,14,51,0.04)
+    shadowColor: '#0F0E33',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 2,
   },
   sm: {
     shadowColor: '#000',

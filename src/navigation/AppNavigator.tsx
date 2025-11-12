@@ -41,9 +41,7 @@ export function AppNavigator() {
           borderRadius: 20,
           marginHorizontal: 4,
         },
-        tabBarBackground: () => (
-          <View style={styles.tabBarBackground} />
-        ),
+        tabBarBackground: () => <View style={styles.tabBarBackground} />,
       }}
     >
       <Tab.Screen
@@ -51,12 +49,7 @@ export function AppNavigator() {
         component={DashboardScreen}
         options={{
           tabBarIcon: ({ color, size, focused }) => (
-            <View
-              style={[
-                styles.iconContainer,
-                focused && styles.activeIconContainer,
-              ]}
-            >
+            <View style={[styles.iconContainer, focused && styles.activeIconContainer]}>
               <Ionicons name="home" color={color} size={size} />
             </View>
           ),
@@ -68,12 +61,7 @@ export function AppNavigator() {
         component={TransactionsScreen}
         options={{
           tabBarIcon: ({ color, size, focused }) => (
-            <View
-              style={[
-                styles.iconContainer,
-                focused && styles.activeIconContainer,
-              ]}
-            >
+            <View style={[styles.iconContainer, focused && styles.activeIconContainer]}>
               <Ionicons name="list" color={color} size={size} />
             </View>
           ),
@@ -85,12 +73,7 @@ export function AppNavigator() {
         component={AnalyticsScreen}
         options={{
           tabBarIcon: ({ color, size, focused }) => (
-            <View
-              style={[
-                styles.iconContainer,
-                focused && styles.activeIconContainer,
-              ]}
-            >
+            <View style={[styles.iconContainer, focused && styles.activeIconContainer]}>
               <Ionicons name="bar-chart" color={color} size={size} />
             </View>
           ),
