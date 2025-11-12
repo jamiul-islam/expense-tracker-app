@@ -14,32 +14,35 @@ export function AppNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.secondary,
-        tabBarInactiveTintColor: colors.text.secondary,
+        tabBarActiveTintColor: colors.primaryText,
+        tabBarInactiveTintColor: colors.text.tertiary,
         tabBarStyle: {
           backgroundColor: colors.white,
-          borderTopColor: colors.background.secondary,
-          borderTopWidth: 1,
+          borderTopColor: 'transparent',
+          borderTopWidth: 0,
           elevation: 8,
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 8,
-          shadowColor: '#000',
+          height: 86,
+          paddingBottom: 20,
+          paddingHorizontal: 16,
+          paddingTop: 12,
+          shadowColor: '#0F0E33',
           shadowOffset: {
-            height: -2,
+            height: 1,
             width: 0,
           },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
+          shadowOpacity: 0.04,
+          shadowRadius: 4,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
+          fontSize: 14,
+          fontWeight: '500',
           marginTop: 4,
         },
         tabBarItemStyle: {
-          borderRadius: 20,
+          borderRadius: 40,
           marginHorizontal: 4,
+          paddingHorizontal: 14,
+          paddingVertical: 12,
         },
         tabBarBackground: () => <View style={styles.tabBarBackground} />,
       }}
@@ -48,10 +51,12 @@ export function AppNavigator() {
         name="Home"
         component={DashboardScreen}
         options={{
-          tabBarIcon: ({ color, size, focused }) => (
-            <View style={[styles.iconContainer, focused && styles.activeIconContainer]}>
-              <Ionicons name="home" color={color} size={size} />
-            </View>
+          tabBarIcon: ({ focused }) => (
+            <Ionicons
+              name="home"
+              color={focused ? colors.primaryText : colors.text.tertiary}
+              size={20}
+            />
           ),
           tabBarLabel: 'Home',
         }}
@@ -60,10 +65,12 @@ export function AppNavigator() {
         name="Transactions"
         component={TransactionsScreen}
         options={{
-          tabBarIcon: ({ color, size, focused }) => (
-            <View style={[styles.iconContainer, focused && styles.activeIconContainer]}>
-              <Ionicons name="list" color={color} size={size} />
-            </View>
+          tabBarIcon: ({ focused }) => (
+            <Ionicons
+              name="list"
+              color={focused ? colors.primaryText : colors.text.tertiary}
+              size={20}
+            />
           ),
           tabBarLabel: 'Transactions',
         }}
@@ -72,10 +79,12 @@ export function AppNavigator() {
         name="Analytics"
         component={AnalyticsScreen}
         options={{
-          tabBarIcon: ({ color, size, focused }) => (
-            <View style={[styles.iconContainer, focused && styles.activeIconContainer]}>
-              <Ionicons name="bar-chart" color={color} size={size} />
-            </View>
+          tabBarIcon: ({ focused }) => (
+            <Ionicons
+              name="bar-chart"
+              color={focused ? colors.primaryText : colors.text.tertiary}
+              size={20}
+            />
           ),
           tabBarLabel: 'Analytics',
         }}
@@ -85,16 +94,6 @@ export function AppNavigator() {
 }
 
 const styles = StyleSheet.create({
-  activeIconContainer: {
-    backgroundColor: colors.background.activeTab,
-  },
-  iconContainer: {
-    alignItems: 'center',
-    borderRadius: 20,
-    height: 40,
-    justifyContent: 'center',
-    width: 60,
-  },
   tabBarBackground: {
     backgroundColor: colors.white,
     flex: 1,

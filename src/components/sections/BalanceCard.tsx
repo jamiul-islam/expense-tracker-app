@@ -83,24 +83,24 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
         <View style={styles.summaryContainer}>
           {/* Income Card */}
           <View style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>Income</Text>
-            <View style={styles.summaryRow}>
+            <View style={styles.summaryHeader}>
+              <Text style={styles.summaryLabel}>Income</Text>
               <View style={styles.incomeIconCircle}>
-                <Text style={styles.incomeArrow}>↓</Text>
+                <Text style={styles.incomeArrow}>↑</Text>
               </View>
-              <Text style={styles.summaryAmount}>{formatCurrency(income)}</Text>
             </View>
+            <Text style={styles.summaryAmount}>{formatCurrency(income)}</Text>
           </View>
 
           {/* Expense Card */}
           <View style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>Expense</Text>
-            <View style={styles.summaryRow}>
+            <View style={styles.summaryHeader}>
+              <Text style={styles.summaryLabel}>Expense</Text>
               <View style={styles.expenseIconCircle}>
-                <Text style={styles.expenseArrow}>↑</Text>
+                <Text style={styles.expenseArrow}>↓</Text>
               </View>
-              <Text style={styles.summaryAmount}>{formatCurrency(expense)}</Text>
             </View>
+            <Text style={styles.summaryAmount}>{formatCurrency(expense)}</Text>
           </View>
         </View>
       </LinearGradient>
@@ -111,12 +111,17 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
 const styles = StyleSheet.create({
   balanceAmount: {
     color: colors.primaryText,
+    flexShrink: 1,
+    flexWrap: 'wrap',
     fontSize: 30,
     fontWeight: typography.fontWeight.bold,
   },
   balanceAmountContainer: {
-    marginTop: spacing.xs,
-    minHeight: 40,
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    marginTop: spacing.sm,
+    minHeight: 45,
+    paddingRight: spacing.lg,
   },
   balanceHeader: {
     alignItems: 'center',
@@ -216,6 +221,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 10,
     elevation: 1,
+    flex: 1,
     padding: spacing.md,
     shadowColor: '#1E2C40',
     shadowOffset: {
@@ -224,23 +230,23 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.05,
     shadowRadius: 1,
-    width: '48%',
   },
   summaryContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: spacing.md,
     paddingTop: spacing.md,
     zIndex: 2,
+  },
+  summaryHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: spacing.xs,
   },
   summaryLabel: {
     color: colors.text.secondary,
     fontSize: 12,
     fontWeight: typography.fontWeight.medium,
-    marginBottom: spacing.xs,
-  },
-  summaryRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
   },
   visibilityButton: {
     padding: spacing.xs,

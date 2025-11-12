@@ -75,7 +75,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
                   strokeDasharray={`${segment.length} ${circumference}`}
                   strokeDashoffset={-segment.offset}
                   fill="transparent"
-                  strokeLinecap="butt"
+                  strokeLinecap="round"
                 />
               ))}
             </G>
