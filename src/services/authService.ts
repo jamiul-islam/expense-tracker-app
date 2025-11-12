@@ -28,12 +28,15 @@ class AuthService {
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
+      console.log('Login attempt:', { email: credentials.email });
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
         password: credentials.password,
       });
 
       if (error) {
+        console.error('Login error:', error);
         return {
           success: false,
           error: error.message,
@@ -47,6 +50,8 @@ class AuthService {
         };
       }
 
+      console.log('Login successful, fetching profile...');
+      
       // Fetch user profile from database
       const { data: profile, error: profileError } = await supabase
         .from('users')
@@ -55,17 +60,21 @@ class AuthService {
         .single();
 
       if (profileError || !profile) {
+        console.error('Profile fetch error:', profileError);
         return {
           success: false,
           error: 'Failed to fetch user profile',
         };
       }
 
+      console.log('Profile fetched successfully');
+      
       return {
         success: true,
         user: profile as User,
       };
     } catch (error) {
+      console.error('Login exception:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Login failed',
