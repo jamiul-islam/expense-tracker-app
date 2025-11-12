@@ -15,30 +15,34 @@ import type { NavigationProp } from '@react-navigation/native';
 import { TextInput } from '@/components/common/TextInput';
 import { useUserStore } from '@/store';
 import { authService } from '@/services/authService';
-import { storage } from '@/utils/storage';
 import { colors } from '@/theme';
 
 type RootStackParamList = {
   App: undefined;
-  SignUp: undefined;
+  Login: undefined;
 };
 
 interface FormErrors {
+  fullName?: string;
   email?: string;
   password?: string;
+  confirmPassword?: string;
 }
 
-export default function LoginScreen() {
+export default function SignUpScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const setUser = useUserStore((state) => state.setUser);
 
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
 
+  const emailRef = useRef<RNTextInput>(null);
   const passwordRef = useRef<RNTextInput>(null);
+  const confirmPasswordRef = useRef<RNTextInput>(null);
 
   // Email validation
   const validateEmail = (email: string): boolean => {
@@ -49,6 +53,12 @@ export default function LoginScreen() {
   // Form validation
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
+
+    if (!fullName.trim()) {
+      newErrors.fullName = 'Full name is required';
+    } else if (fullName.trim().length < 2) {
+      newErrors.fullName = 'Full name must be at least 2 characters';
+    }
 
     if (!email.trim()) {
       newErrors.email = 'Email is required';
@@ -62,12 +72,18 @@ export default function LoginScreen() {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
+    if (!confirmPassword.trim()) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle login
-  const handleLogin = async () => {
+  // Handle sign up
+  const handleSignUp = async () => {
     if (!validateForm()) {
       return;
     }
@@ -75,27 +91,21 @@ export default function LoginScreen() {
     setIsLoading(true);
 
     try {
-      const response = await authService.login({
+      const response = await authService.signUp({
         email: email.trim(),
         password,
-        rememberMe,
+        fullName: fullName.trim(),
       });
 
       if (response.success && response.user) {
         setUser(response.user);
-        
-        if (rememberMe) {
-          await storage.setRememberMe(true);
-          await storage.setUserId(response.user.id);
-        }
-
         navigation.reset({
           index: 0,
           routes: [{ name: 'App' }],
         });
       } else {
         setErrors({
-          email: response.error || 'Login failed',
+          email: response.error || 'Sign up failed',
         });
       }
     } catch (error) {
@@ -121,13 +131,32 @@ export default function LoginScreen() {
           <View style={styles.iconContainer}>
             <Text style={styles.icon}>💰</Text>
           </View>
-          <Text style={styles.title}>Welcome Back</Text>
-          <Text style={styles.subtitle}>Sign in to continue to Tranzo</Text>
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>Sign up to start tracking your expenses</Text>
         </View>
 
         {/* Form */}
         <View style={styles.form}>
           <TextInput
+            label="Full Name"
+            placeholder="Enter your full name"
+            value={fullName}
+            onChangeText={(text) => {
+              setFullName(text);
+              if (errors.fullName) {
+                setErrors({ ...errors, fullName: undefined });
+              }
+            }}
+            error={errors.fullName}
+            autoCapitalize="words"
+            autoCorrect={false}
+            returnKeyType="next"
+            onSubmitEditing={() => emailRef.current?.focus()}
+            editable={!isLoading}
+          />
+
+          <TextInput
+            ref={emailRef}
             label="Email"
             placeholder="Enter your email"
             value={email}
@@ -149,7 +178,7 @@ export default function LoginScreen() {
           <TextInput
             ref={passwordRef}
             label="Password"
-            placeholder="Enter your password"
+            placeholder="Create a password (min 6 characters)"
             value={password}
             onChangeText={(text) => {
               setPassword(text);
@@ -159,44 +188,50 @@ export default function LoginScreen() {
             }}
             error={errors.password}
             secureTextEntry
-            returnKeyType="done"
-            onSubmitEditing={handleLogin}
+            returnKeyType="next"
+            onSubmitEditing={() => confirmPasswordRef.current?.focus()}
             editable={!isLoading}
           />
 
-          {/* Remember Me */}
-          <TouchableOpacity
-            style={styles.rememberMeContainer}
-            onPress={() => setRememberMe(!rememberMe)}
-            disabled={isLoading}
-          >
-            <View style={styles.checkbox}>
-              {rememberMe && <View style={styles.checkboxInner} />}
-            </View>
-            <Text style={styles.rememberMeText}>Remember me</Text>
-          </TouchableOpacity>
+          <TextInput
+            ref={confirmPasswordRef}
+            label="Confirm Password"
+            placeholder="Re-enter your password"
+            value={confirmPassword}
+            onChangeText={(text) => {
+              setConfirmPassword(text);
+              if (errors.confirmPassword) {
+                setErrors({ ...errors, confirmPassword: undefined });
+              }
+            }}
+            error={errors.confirmPassword}
+            secureTextEntry
+            returnKeyType="done"
+            onSubmitEditing={handleSignUp}
+            editable={!isLoading}
+          />
 
-          {/* Login Button */}
+          {/* Sign Up Button */}
           <TouchableOpacity
             style={[styles.button, isLoading && styles.buttonDisabled]}
-            onPress={handleLogin}
+            onPress={handleSignUp}
             disabled={isLoading}
           >
             {isLoading ? (
               <ActivityIndicator color={colors.white} />
             ) : (
-              <Text style={styles.buttonText}>Sign In</Text>
+              <Text style={styles.buttonText}>Sign Up</Text>
             )}
           </TouchableOpacity>
 
-          {/* Sign Up Link */}
-          <View style={styles.signUpContainer}>
-            <Text style={styles.signUpText}>Don't have an account? </Text>
+          {/* Login Link */}
+          <View style={styles.loginContainer}>
+            <Text style={styles.loginText}>Already have an account? </Text>
             <TouchableOpacity
-              onPress={() => navigation.navigate('SignUp')}
+              onPress={() => navigation.navigate('Login')}
               disabled={isLoading}
             >
-              <Text style={styles.signUpLink}>Sign Up</Text>
+              <Text style={styles.loginLink}>Sign In</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -240,34 +275,10 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: colors.text.secondary,
+    textAlign: 'center',
   },
   form: {
     flex: 1,
-  },
-  rememberMeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderRadius: 4,
-    marginRight: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxInner: {
-    width: 12,
-    height: 12,
-    backgroundColor: colors.secondary,
-    borderRadius: 2,
-  },
-  rememberMeText: {
-    fontSize: 14,
-    color: colors.text.primary,
   },
   button: {
     height: 48,
@@ -275,6 +286,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 8,
   },
   buttonDisabled: {
     opacity: 0.6,
@@ -284,17 +296,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.white,
   },
-  signUpContainer: {
+  loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 24,
   },
-  signUpText: {
+  loginText: {
     fontSize: 14,
     color: colors.text.secondary,
   },
-  signUpLink: {
+  loginLink: {
     fontSize: 14,
     fontWeight: '600',
     color: colors.secondary,

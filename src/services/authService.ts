@@ -7,6 +7,12 @@ export interface LoginCredentials {
   rememberMe?: boolean;
 }
 
+export interface SignUpCredentials {
+  email: string;
+  password: string;
+  fullName: string;
+}
+
 export interface AuthResponse {
   success: boolean;
   user?: User;
@@ -63,6 +69,66 @@ class AuthService {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Login failed',
+      };
+    }
+  }
+
+  /**
+   * Sign up with email, password, and full name
+   */
+  async signUp(credentials: SignUpCredentials): Promise<AuthResponse> {
+    try {
+      // Create auth user
+      const { data, error } = await supabase.auth.signUp({
+        email: credentials.email,
+        password: credentials.password,
+      });
+
+      if (error) {
+        return {
+          success: false,
+          error: error.message,
+        };
+      }
+
+      if (!data.user) {
+        return {
+          success: false,
+          error: 'No user returned from authentication',
+        };
+      }
+
+      // Create user profile in database
+      const { data: profile, error: profileError } = await supabase
+        .from('users')
+        .insert({
+          id: data.user.id,
+          email: credentials.email,
+          full_name: credentials.fullName,
+          currency: 'USD',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (profileError || !profile) {
+        // If profile creation fails, clean up the auth user
+        await supabase.auth.admin.deleteUser(data.user.id);
+        return {
+          success: false,
+          error: 'Failed to create user profile',
+        };
+      }
+
+      return {
+        success: true,
+        user: profile as User,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Sign up failed',
       };
     }
   }
