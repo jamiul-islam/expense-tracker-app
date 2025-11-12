@@ -3,15 +3,16 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, RefreshControl, SafeAreaView } from 'react-native';
+import { View, StyleSheet, ScrollView, RefreshControl, SafeAreaView, TouchableOpacity } from 'react-native';
 import { colors, spacing } from '@/theme';
 import {
   ScreenHeader,
   BalanceCard,
   DonutChart,
-  TransactionList,
+  TransactionItem,
   LoadingSpinner,
   Text,
+  Card,
 } from '@/components';
 import { useUserStore } from '@/store/userStore';
 import { useTransactionStore } from '@/store/transactionStore';
@@ -53,28 +54,44 @@ export default function DashboardScreen() {
 
   const totalBalance = totalIncome - totalExpense;
 
-  // Top spending categories (mock data for now)
-  const topSpendingData = [
-    {
-      category: 'Grocery',
-      amount: 612.3,
-      percentage: 16.6,
-      color: colors.chart.grocery,
-    },
-    {
-      category: 'Transport',
-      amount: 478.55,
-      percentage: 21.2,
-      color: colors.chart.transport,
-    },
-    {
-      category: 'Entertainment',
-      amount: 395.2,
-      percentage: 13.7,
-      color: colors.chart.entertainment,
-    },
-  ];
+  // Calculate top spending categories from actual transaction data
+  const calculateTopSpending = () => {
+    const categoryTotals: { [key: string]: number } = {};
+    
+    transactions
+      .filter(t => t.type === 'expense')
+      .forEach(t => {
+        categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount;
+      });
 
+    const categoryArray = Object.entries(categoryTotals).map(([category, amount]) => ({
+      category,
+      amount,
+    }));
+
+    categoryArray.sort((a, b) => b.amount - a.amount);
+    
+    const top3 = categoryArray.slice(0, 3);
+    const totalOfTop3 = top3.reduce((sum, item) => sum + item.amount, 0);
+
+    // Map categories to their designated colors
+    const colorMap: { [key: string]: string } = {
+      Grocery: colors.chart.grocery,
+      Transport: colors.chart.transport,
+      Entertainment: colors.chart.entertainment,
+      Medicine: colors.chart.medicine,
+      Education: colors.chart.education,
+    };
+
+    return top3.map(item => ({
+      category: item.category,
+      amount: item.amount,
+      percentage: totalOfTop3 > 0 ? (item.amount / totalOfTop3) * 100 : 0,
+      color: colorMap[item.category] || colors.chart.grocery,
+    }));
+  };
+
+  const topSpendingData = calculateTopSpending();
   const totalSpent = topSpendingData.reduce((sum, item) => sum + item.amount, 0);
 
   // Group recent transactions by date
@@ -133,12 +150,43 @@ export default function DashboardScreen() {
         <DonutChart data={topSpendingData} totalSpent={totalSpent} />
 
         {/* Recent Transactions */}
-        <View style={styles.recentSection}>
+        <Card style={styles.recentCard}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recent Transactions</Text>
           </View>
+
           {recentTransactionSections.length > 0 ? (
-            <TransactionList sections={recentTransactionSections} onTransactionPress={() => {}} />
+            <View style={styles.transactionsContent}>
+              {recentTransactionSections.map((section, sectionIndex) => (
+                <View key={sectionIndex} style={styles.dateGroup}>
+                  {/* Date Header */}
+                  <View style={styles.dateHeader}>
+                    <Text style={styles.dateText}>{section.title}</Text>
+                    <Text style={styles.dateTotalText}>
+                      {formatCurrency(
+                        section.data.reduce((sum, t) => sum + (t.type === 'expense' ? -t.amount : t.amount), 0)
+                      )}
+                    </Text>
+                  </View>
+
+                  {/* Transactions for this date */}
+                  {section.data.map((transaction, index) => (
+                    <React.Fragment key={transaction.id}>
+                      <TransactionItem transaction={transaction} onPress={() => {}} />
+                      {index < section.data.length - 1 && <View style={styles.divider} />}
+                    </React.Fragment>
+                  ))}
+                </View>
+              ))}
+
+              {/* See More Button */}
+              <TouchableOpacity style={styles.seeMoreButton} onPress={() => {}}>
+                <Text style={styles.seeMoreText}>See more transactions</Text>
+                <View style={styles.arrowIcon}>
+                  <Text style={styles.arrowText}>›</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           ) : (
             <View style={styles.emptyState}>
               <Text style={styles.emptyText}>No recent transactions</Text>
@@ -147,16 +195,61 @@ export default function DashboardScreen() {
               </Text>
             </View>
           )}
-        </View>
+        </Card>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(Math.abs(amount));
+};
+
 const styles = StyleSheet.create({
+  arrowIcon: {
+    alignItems: 'center',
+    height: 14,
+    justifyContent: 'center',
+    marginLeft: spacing.xs,
+    width: 14,
+  },
+  arrowText: {
+    color: colors.infoBlue,
+    fontSize: 18,
+    fontWeight: '600',
+    transform: [{ rotate: '90deg' }],
+  },
   container: {
     backgroundColor: colors.background.primary,
     flex: 1,
+  },
+  dateGroup: {
+    marginBottom: spacing.md,
+  },
+  dateHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.sm,
+  },
+  dateText: {
+    color: colors.text.secondary,
+    fontSize: 14,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+  },
+  dateTotalText: {
+    color: colors.text.dailyTotal,
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  divider: {
+    backgroundColor: colors.border,
+    height: 1,
+    marginLeft: spacing['3xl'] + spacing.lg,
   },
   emptyState: {
     alignItems: 'center',
@@ -171,17 +264,43 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     fontSize: 14,
   },
-  recentSection: {
+  recentCard: {
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    marginBottom: spacing['3xl'],
+    marginHorizontal: spacing.lg,
     marginTop: spacing.md,
-    paddingBottom: spacing['3xl'],
+    paddingBottom: spacing.md,
+    shadowColor: '#172551',
+    shadowOffset: {
+      height: 4,
+      width: 0,
+    },
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
   },
   sectionHeader: {
+    paddingBottom: spacing.sm,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingTop: spacing.lg,
   },
   sectionTitle: {
-    color: colors.text.primary,
+    color: colors.primaryText,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '500',
+  },
+  seeMoreButton: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginTop: spacing.md,
+    paddingLeft: spacing.lg,
+  },
+  seeMoreText: {
+    color: colors.infoBlue,
+    fontSize: 12,
+    fontWeight: '400',
+  },
+  transactionsContent: {
+    paddingHorizontal: spacing.lg,
   },
 });
