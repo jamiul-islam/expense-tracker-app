@@ -87,13 +87,21 @@ class AuthService {
    */
   async signUp(credentials: SignUpCredentials): Promise<AuthResponse> {
     try {
-      // Create auth user
+      console.log('Sign up attempt:', { email: credentials.email, fullName: credentials.fullName });
+      
+      // Create auth user with metadata
       const { data, error } = await supabase.auth.signUp({
         email: credentials.email,
         password: credentials.password,
+        options: {
+          data: {
+            full_name: credentials.fullName,
+          },
+        },
       });
 
       if (error) {
+        console.error('Sign up auth error:', error);
         return {
           success: false,
           error: error.message,
@@ -101,40 +109,42 @@ class AuthService {
       }
 
       if (!data.user) {
+        console.error('No user returned from authentication');
         return {
           success: false,
           error: 'No user returned from authentication',
         };
       }
 
-      // Create user profile in database
+      console.log('Auth user created, ID:', data.user.id);
+      console.log('User profile should be created automatically by trigger');
+
+      // Wait a moment for the trigger to complete
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Fetch the created user profile
       const { data: profile, error: profileError } = await supabase
         .from('users')
-        .insert({
-          id: data.user.id,
-          email: credentials.email,
-          full_name: credentials.fullName,
-          currency: 'USD',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .select()
+        .select('*')
+        .eq('id', data.user.id)
         .single();
 
       if (profileError || !profile) {
-        // If profile creation fails, clean up the auth user
-        await supabase.auth.admin.deleteUser(data.user.id);
+        console.error('Profile fetch error:', profileError);
         return {
           success: false,
           error: 'Failed to create user profile',
         };
       }
 
+      console.log('User profile fetched successfully:', profile);
+
       return {
         success: true,
         user: profile as User,
       };
     } catch (error) {
+      console.error('Sign up exception:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Sign up failed',
