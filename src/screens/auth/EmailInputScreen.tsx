@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { TextInput } from '@/components/common';
+import { TextInput } from '@/components';
 import { colors } from '@/theme';
 import { authService } from '@/services/authService';
 

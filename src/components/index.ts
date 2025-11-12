@@ -1,1 +1,1 @@
-export { };
+export { TextInput } from './common/TextInput';
