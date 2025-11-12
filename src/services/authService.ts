@@ -117,12 +117,23 @@ class AuthService {
       }
 
       console.log('Auth user created, ID:', data.user.id);
+      console.log('Session established:', !!data.session);
+      
+      if (!data.session) {
+        console.error('No session returned - email confirmation may be required');
+        return {
+          success: false,
+          error: 'Please check your email to confirm your account',
+        };
+      }
+
       console.log('Waiting for trigger to create profile...');
 
-      // Wait a moment for the trigger to execute
-      await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
+      // Wait for trigger to execute and session to propagate
+      await new Promise<void>((resolve) => setTimeout(() => resolve(), 1000));
 
       // Fetch the profile created by trigger
+      // Since we have a valid session, auth.uid() should work now
       const { data: profile, error: profileError } = await supabase
         .from('users')
         .select('*')
@@ -131,10 +142,11 @@ class AuthService {
 
       if (profileError || !profile) {
         console.error('Profile fetch error:', profileError);
+        console.log('Session check - user ID:', data.user.id);
         
-        // Retry once after another delay
-        console.log('Retrying profile fetch...');
-        await new Promise<void>((resolve) => setTimeout(() => resolve(), 1000));
+        // Retry with longer delay
+        console.log('Retrying profile fetch after longer delay...');
+        await new Promise<void>((resolve) => setTimeout(() => resolve(), 2000));
         
         const { data: retryProfile, error: retryError } = await supabase
           .from('users')
@@ -144,9 +156,40 @@ class AuthService {
         
         if (retryError || !retryProfile) {
           console.error('Profile fetch retry error:', retryError);
+          
+          // Profile exists (trigger created it), but RLS is blocking
+          // This means session propagation is taking too long
+          // Let's try refreshing the session
+          console.log('Attempting to refresh session...');
+          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+          
+          if (refreshError || !refreshData.session) {
+            console.error('Session refresh error:', refreshError);
+            return {
+              success: false,
+              error: 'Account created but unable to sign in. Please try logging in.',
+            };
+          }
+          
+          // Try one more time with refreshed session
+          const { data: finalProfile, error: finalError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', data.user.id)
+            .single();
+          
+          if (finalError || !finalProfile) {
+            console.error('Final profile fetch error:', finalError);
+            return {
+              success: false,
+              error: 'Account created. Please try logging in.',
+            };
+          }
+          
+          console.log('Profile fetched after session refresh');
           return {
-            success: false,
-            error: 'Failed to create user profile. Please try logging in.',
+            success: true,
+            user: finalProfile as User,
           };
         }
         
