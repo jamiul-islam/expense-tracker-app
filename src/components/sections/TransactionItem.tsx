@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { colors, spacing, typography, borderRadius } from '@/theme';
+import { colors, spacing, typography } from '@/theme';
 import { Text } from '../common/Text';
 import { Icon } from '../common/Icon';
 import type { Transaction } from '@/types/database';
@@ -40,15 +40,6 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, o
     }).format(amount);
   };
 
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
-
   const isIncome = transaction.type === 'income';
 
   return (
@@ -58,76 +49,68 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, o
       activeOpacity={0.7}
     >
       <View style={styles.iconContainer}>
-        <View style={[styles.iconWrapper, { backgroundColor: colors.light }]}>
-          <Icon name={getCategoryIcon(transaction.category)} size="md" color={colors.primary} />
-        </View>
+        <Icon name={getCategoryIcon(transaction.category)} size="md" color={colors.primary} />
       </View>
 
-      <View style={styles.content}>
+      <View style={styles.textContainer}>
         <Text style={styles.title}>{transaction.title}</Text>
         <Text style={styles.category}>{transaction.category}</Text>
       </View>
 
-      <View style={styles.amountContainer}>
+      <View style={styles.rightSection}>
         <Text style={isIncome ? styles.incomeAmount : styles.expenseAmount}>
           {isIncome ? '+' : '-'}
           {formatCurrency(Math.abs(transaction.amount))}
         </Text>
-        <Text style={styles.date}>{formatDate(transaction.date)}</Text>
       </View>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  amountContainer: {
-    alignItems: 'flex-end',
-  },
   category: {
     color: colors.text.secondary,
-    fontSize: typography.fontSize.xs,
-    marginTop: spacing.xs,
+    fontSize: 12,
+    fontWeight: typography.fontWeight.medium,
+    marginTop: 2,
   },
   container: {
     alignItems: 'center',
+    backgroundColor: colors.background.card,
+    borderBottomColor: colors.background.secondary,
+    borderBottomWidth: 1,
     flexDirection: 'row',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
-  content: {
-    flex: 1,
-    marginLeft: spacing.md,
-  },
-  date: {
-    color: colors.text.tertiary,
-    fontSize: typography.fontSize.xs,
-    marginTop: spacing.xs,
-  },
   expenseAmount: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.sm,
+    color: colors.primaryDark,
+    fontSize: 14,
     fontWeight: typography.fontWeight.semibold,
-    textAlign: 'right',
   },
   iconContainer: {
-    marginRight: spacing.sm,
-  },
-  iconWrapper: {
     alignItems: 'center',
-    borderRadius: borderRadius.md,
-    height: 44,
+    backgroundColor: colors.background.iconCircle,
+    borderRadius: 20,
+    height: 40,
     justifyContent: 'center',
-    width: 44,
+    marginRight: spacing.md,
+    width: 40,
   },
   incomeAmount: {
     color: colors.success,
-    fontSize: typography.fontSize.sm,
+    fontSize: 14,
     fontWeight: typography.fontWeight.semibold,
-    textAlign: 'right',
+  },
+  rightSection: {
+    alignItems: 'flex-end',
+  },
+  textContainer: {
+    flex: 1,
   },
   title: {
     color: colors.text.primary,
-    fontSize: typography.fontSize.sm,
+    fontSize: 14,
     fontWeight: typography.fontWeight.medium,
   },
 });

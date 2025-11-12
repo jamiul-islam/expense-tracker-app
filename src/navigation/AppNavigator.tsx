@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet } from 'react-native';
 import { colors } from '@/theme';
 import DashboardScreen from '@/screens/app/DashboardScreen';
 import TransactionsScreen from '@/screens/app/TransactionsScreen';
@@ -36,13 +37,29 @@ export function AppNavigator() {
           fontWeight: '600',
           marginTop: 4,
         },
+        tabBarItemStyle: {
+          borderRadius: 20,
+          marginHorizontal: 4,
+        },
+        tabBarBackground: () => (
+          <View style={styles.tabBarBackground} />
+        ),
       }}
     >
       <Tab.Screen
         name="Home"
         component={DashboardScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Ionicons name="home" color={color} size={size} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <View
+              style={[
+                styles.iconContainer,
+                focused && styles.activeIconContainer,
+              ]}
+            >
+              <Ionicons name="home" color={color} size={size} />
+            </View>
+          ),
           tabBarLabel: 'Home',
         }}
       />
@@ -50,7 +67,16 @@ export function AppNavigator() {
         name="Transactions"
         component={TransactionsScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Ionicons name="list" color={color} size={size} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <View
+              style={[
+                styles.iconContainer,
+                focused && styles.activeIconContainer,
+              ]}
+            >
+              <Ionicons name="list" color={color} size={size} />
+            </View>
+          ),
           tabBarLabel: 'Transactions',
         }}
       />
@@ -58,10 +84,36 @@ export function AppNavigator() {
         name="Analytics"
         component={AnalyticsScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Ionicons name="bar-chart" color={color} size={size} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <View
+              style={[
+                styles.iconContainer,
+                focused && styles.activeIconContainer,
+              ]}
+            >
+              <Ionicons name="bar-chart" color={color} size={size} />
+            </View>
+          ),
           tabBarLabel: 'Analytics',
         }}
       />
     </Tab.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  activeIconContainer: {
+    backgroundColor: colors.background.activeTab,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    borderRadius: 20,
+    height: 40,
+    justifyContent: 'center',
+    width: 60,
+  },
+  tabBarBackground: {
+    backgroundColor: colors.white,
+    flex: 1,
+  },
+});

@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { colors, spacing, typography, borderRadius } from '@/theme';
+import { colors, spacing, typography } from '@/theme';
 import { Text } from '../common/Text';
 import { Card } from '../common/Card';
 
@@ -67,14 +67,15 @@ export const DonutChart: React.FC<DonutChartProps> = ({
 
 const styles = StyleSheet.create({
   centerAmount: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.xl,
+    color: colors.primaryText,
+    fontSize: 20,
     fontWeight: typography.fontWeight.bold,
   },
   centerText: {
     color: colors.text.secondary,
-    fontSize: typography.fontSize.xs,
-    marginTop: spacing.xs,
+    fontSize: 12,
+    fontWeight: typography.fontWeight.medium,
+    marginTop: 4,
   },
   chartContainer: {
     alignItems: 'center',
@@ -82,40 +83,53 @@ const styles = StyleSheet.create({
   },
   chartPlaceholder: {
     alignItems: 'center',
-    backgroundColor: colors.light,
-    borderRadius: 125,
-    height: 250,
+    backgroundColor: colors.background.secondary,
+    borderRadius: 109,
+    height: 218,
     justifyContent: 'center',
-    width: 250,
+    width: 222,
   },
   container: {
+    backgroundColor: colors.white,
+    borderRadius: 20,
     marginHorizontal: spacing.lg,
     marginVertical: spacing.md,
+    padding: spacing.lg,
+    shadowColor: '#172551',
+    shadowOffset: {
+      height: 4,
+      width: 0,
+    },
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
   },
   legendAmount: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.semibold,
+    color: colors.primaryText,
+    fontSize: 14,
+    fontWeight: typography.fontWeight.medium,
     textAlign: 'right',
   },
   legendCategory: {
     color: colors.text.primary,
-    fontSize: typography.fontSize.sm,
+    flex: 1,
+    fontSize: 14,
+    fontWeight: typography.fontWeight.medium,
     marginLeft: spacing.sm,
   },
   legendContainer: {
-    marginTop: spacing.md,
+    marginTop: spacing.sm,
   },
   legendDot: {
-    borderRadius: borderRadius.full,
-    height: 12,
-    width: 12,
+    borderRadius: 8,
+    height: 16,
+    width: 16,
   },
   legendItem: {
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: spacing.md,
+    paddingVertical: spacing.xs,
   },
   legendLeft: {
     alignItems: 'center',
@@ -124,18 +138,19 @@ const styles = StyleSheet.create({
   },
   legendPercentage: {
     color: colors.text.secondary,
-    fontSize: typography.fontSize.xs,
-    marginTop: spacing.xs,
-    textAlign: 'right',
+    fontSize: 12,
+    fontWeight: typography.fontWeight.medium,
+    marginLeft: spacing.xs,
   },
   legendRight: {
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   title: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.base,
+    color: colors.primaryText,
+    fontSize: 16,
     fontWeight: typography.fontWeight.medium,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
   },
 });
 

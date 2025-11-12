@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors, spacing, borderRadius, typography, shadows } from '@/theme';
+import { colors, spacing, typography } from '@/theme';
 import { Text } from '../common/Text';
 import { Icon } from '../common/Icon';
 
@@ -104,8 +104,8 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
 
 const styles = StyleSheet.create({
   balanceAmount: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize['4xl'],
+    color: colors.primaryText,
+    fontSize: 30,
     fontWeight: typography.fontWeight.bold,
     marginTop: spacing.sm,
   },
@@ -116,39 +116,55 @@ const styles = StyleSheet.create({
   },
   balanceLabel: {
     color: colors.text.secondary,
-    fontSize: typography.fontSize.xs,
+    fontSize: 12,
     fontWeight: typography.fontWeight.medium,
     letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   balanceSection: {
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.md,
   },
   card: {
-    borderRadius: borderRadius.lg,
+    borderColor: colors.white,
+    borderRadius: 20,
+    borderWidth: 1,
     marginHorizontal: spacing.lg,
     marginVertical: spacing.md,
     padding: spacing.xl,
-    ...shadows.md,
+    shadowColor: '#172551',
+    shadowOffset: {
+      height: 4,
+      width: 0,
+    },
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
   },
   divider: {
     backgroundColor: colors.white,
     height: 1,
-    marginVertical: spacing.md,
+    marginVertical: spacing.lg,
     opacity: 0.3,
   },
   summaryAmount: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.xl,
+    color: colors.primaryText,
+    fontSize: 20,
     fontWeight: typography.fontWeight.medium,
-    marginTop: spacing.xs,
+    marginTop: 4,
   },
   summaryCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: borderRadius.md,
+    backgroundColor: colors.white,
+    borderRadius: 10,
+    elevation: 1,
     flexDirection: 'row',
     padding: spacing.md,
+    shadowColor: '#1E2C40',
+    shadowOffset: {
+      height: 1,
+      width: 0,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 1,
     width: '48%',
-    ...shadows.sm,
   },
   summaryContainer: {
     flexDirection: 'row',
@@ -165,7 +181,7 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     color: colors.text.secondary,
-    fontSize: typography.fontSize.xs,
+    fontSize: 12,
     fontWeight: typography.fontWeight.medium,
   },
   visibilityButton: {

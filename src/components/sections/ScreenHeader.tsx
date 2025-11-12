@@ -76,12 +76,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingBottom: spacing.sm,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingTop: spacing.md,
   },
   greeting: {
     color: colors.text.secondary,
-    fontSize: typography.fontSize.sm,
+    fontSize: 14,
     fontWeight: typography.fontWeight.regular,
   },
   leftSection: {
@@ -105,9 +106,9 @@ const styles = StyleSheet.create({
   },
   userName: {
     color: colors.text.primary,
-    fontSize: typography.fontSize.xl,
+    fontSize: 20,
     fontWeight: typography.fontWeight.semibold,
-    marginTop: spacing.xs,
+    marginTop: 4,
   },
 });
 
