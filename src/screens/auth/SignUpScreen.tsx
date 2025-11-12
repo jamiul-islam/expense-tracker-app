@@ -98,17 +98,16 @@ export default function SignUpScreen() {
       });
 
       if (response.success && response.user) {
+        // Set user in store - navigation will handle automatically
         setUser(response.user);
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'App' }],
-        });
+        console.log('✓ Sign up successful, user set in store');
       } else {
         setErrors({
           email: response.error || 'Sign up failed',
         });
       }
     } catch (error) {
+      console.error('Sign up error:', error);
       setErrors({
         email: 'An unexpected error occurred',
       });

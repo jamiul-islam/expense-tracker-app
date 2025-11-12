@@ -82,23 +82,21 @@ export default function LoginScreen() {
       });
 
       if (response.success && response.user) {
+        // Set user in store - navigation will handle automatically
         setUser(response.user);
+        console.log('✓ Login successful, user set in store');
         
         if (rememberMe) {
           await storage.setRememberMe(true);
           await storage.setUserId(response.user.id);
         }
-
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'App' }],
-        });
       } else {
         setErrors({
           email: response.error || 'Login failed',
         });
       }
     } catch (error) {
+      console.error('Login error:', error);
       setErrors({
         email: 'An unexpected error occurred',
       });

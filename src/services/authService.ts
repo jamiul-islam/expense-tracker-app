@@ -89,15 +89,10 @@ class AuthService {
     try {
       console.log('Sign up attempt:', { email: credentials.email, fullName: credentials.fullName });
       
-      // Create auth user with metadata
+      // Create auth user
       const { data, error } = await supabase.auth.signUp({
         email: credentials.email,
         password: credentials.password,
-        options: {
-          data: {
-            full_name: credentials.fullName,
-          },
-        },
       });
 
       if (error) {
@@ -117,46 +112,59 @@ class AuthService {
       }
 
       console.log('Auth user created, ID:', data.user.id);
-      console.log('User profile should be created automatically by trigger');
 
-      // Retry mechanism to fetch profile (trigger may take a moment)
-      let profile = null;
-      let profileError = null;
-      const maxRetries = 5;
-      const retryDelay = 1000; // 1 second between retries
-
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        console.log(`Fetching profile... (attempt ${attempt}/${maxRetries})`);
-        
-        await new Promise<void>((resolve) => {
-          setTimeout(() => resolve(), retryDelay);
+      // Create user profile in public.users table
+      const { error: profileError } = await supabase
+        .from('users')
+        .insert({
+          id: data.user.id,
+          email: credentials.email,
+          full_name: credentials.fullName,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         });
 
-        const result = await supabase
+      if (profileError) {
+        console.error('Profile creation error:', profileError);
+        // If profile creation fails, still try to fetch it (might exist from trigger)
+        const { data: existingProfile } = await supabase
           .from('users')
           .select('*')
           .eq('id', data.user.id)
           .single();
-
-        if (!result.error && result.data) {
-          profile = result.data;
-          console.log('✓ Profile found!');
-          break;
+        
+        if (existingProfile) {
+          console.log('Profile already exists, using existing profile');
+          return {
+            success: true,
+            user: existingProfile as User,
+          };
         }
-
-        profileError = result.error;
-        console.log(`Profile not ready yet (attempt ${attempt}), retrying...`);
-      }
-
-      if (profileError || !profile) {
-        console.error('Profile fetch error after retries:', profileError);
+        
         return {
           success: false,
           error: 'Failed to create user profile. Please try logging in.',
         };
       }
 
-      console.log('User profile fetched successfully:', profile);
+      console.log('Profile created successfully');
+
+      // Fetch the created profile
+      const { data: profile, error: fetchError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+
+      if (fetchError || !profile) {
+        console.error('Profile fetch error:', fetchError);
+        return {
+          success: false,
+          error: 'Failed to fetch user profile',
+        };
+      }
+
+      console.log('User profile fetched successfully');
 
       return {
         success: true,
