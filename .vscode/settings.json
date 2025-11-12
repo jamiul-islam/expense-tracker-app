@@ -1,0 +1,7 @@
+{
+  "terminal.integrated.env.osx": {
+    "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:${env:PATH}"
+  },
+  "terminal.integrated.cwd": "${workspaceFolder}",
+  "terminal.integrated.defaultProfile.osx": "zsh"
+}
