@@ -38,8 +38,8 @@ export const colors = {
   // Gradient Colors
   gradient: {
     balance: {
-      start: '#E0F2FE',
-      end: '#60A5FA',
+      start: '#E0F2FE', // Light cyan
+      end: '#7DD3FC', // Sky blue - updated to match Figma
     },
     success: '#10B981',
     warning: '#F59E0B',

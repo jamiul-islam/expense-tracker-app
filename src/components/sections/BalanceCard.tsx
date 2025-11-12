@@ -37,68 +37,74 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
   };
 
   return (
-    <LinearGradient
-      colors={[colors.gradient.balance.start, colors.gradient.balance.end]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.card}
-    >
-      {/* Total Balance Section */}
-      <View style={styles.balanceSection}>
-        <View style={styles.balanceHeader}>
-          <Text style={styles.balanceLabel}>TOTAL BALANCE</Text>
-          <TouchableOpacity
-            onPress={toggleBalanceVisibility}
-            style={styles.visibilityButton}
-            activeOpacity={0.7}
-          >
-            <Icon
-              name={isBalanceVisible ? 'eye-outline' : 'eye-off-outline'}
-              size="md"
-              color={colors.text.primary}
-            />
-          </TouchableOpacity>
+    <View style={styles.cardContainer}>
+      <LinearGradient
+        colors={['#E0F2FE', '#7DD3FC']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.card}
+      >
+        {/* Decorative circles - matching Figma */}
+        <View style={styles.decorativeCircleLeft} />
+        <View style={styles.decorativeCircleRight} />
+
+        {/* Total Balance Section */}
+        <View style={styles.balanceSection}>
+          <View style={styles.balanceHeader}>
+            <Text style={styles.balanceLabel}>TOTAL BALANCE</Text>
+            <TouchableOpacity
+              onPress={toggleBalanceVisibility}
+              style={styles.visibilityButton}
+              activeOpacity={0.7}
+            >
+              <Icon
+                name={isBalanceVisible ? 'eye-outline' : 'eye-off-outline'}
+                size="md"
+                color={colors.text.primary}
+              />
+            </TouchableOpacity>
+          </View>
+
+          {isBalanceVisible ? (
+            <View style={styles.balanceAmountContainer}>
+              <Text style={styles.balanceAmount}>{formatCurrency(totalBalance)}</Text>
+            </View>
+          ) : (
+            <View style={styles.balanceAmountContainer}>
+              <Text style={styles.balanceAmount}>••••••</Text>
+            </View>
+          )}
         </View>
 
-        {isBalanceVisible ? (
-          <View>
-            <Text style={styles.balanceAmount}>{formatCurrency(totalBalance)}</Text>
-          </View>
-        ) : (
-          <View>
-            <Text style={styles.balanceAmount}>••••••</Text>
-          </View>
-        )}
-      </View>
+        {/* Divider */}
+        <View style={styles.divider} />
 
-      {/* Divider */}
-      <View style={styles.divider} />
-
-      {/* Income & Expense Summary */}
-      <View style={styles.summaryContainer}>
-        {/* Income Card */}
-        <View style={styles.summaryCard}>
-          <View style={styles.summaryIconContainer}>
-            <Icon name="arrow-down-outline" size="sm" color={colors.success} />
-          </View>
-          <View style={styles.summaryContent}>
+        {/* Income & Expense Summary */}
+        <View style={styles.summaryContainer}>
+          {/* Income Card */}
+          <View style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>Income</Text>
-            <Text style={styles.summaryAmount}>{formatCurrency(income)}</Text>
+            <View style={styles.summaryRow}>
+              <View style={styles.incomeIconCircle}>
+                <Text style={styles.incomeArrow}>↓</Text>
+              </View>
+              <Text style={styles.summaryAmount}>{formatCurrency(income)}</Text>
+            </View>
           </View>
-        </View>
 
-        {/* Expense Card */}
-        <View style={styles.summaryCard}>
-          <View style={styles.summaryIconContainer}>
-            <Icon name="arrow-up-outline" size="sm" color={colors.danger} />
-          </View>
-          <View style={styles.summaryContent}>
+          {/* Expense Card */}
+          <View style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>Expense</Text>
-            <Text style={styles.summaryAmount}>{formatCurrency(expense)}</Text>
+            <View style={styles.summaryRow}>
+              <View style={styles.expenseIconCircle}>
+                <Text style={styles.expenseArrow}>↑</Text>
+              </View>
+              <Text style={styles.summaryAmount}>{formatCurrency(expense)}</Text>
+            </View>
           </View>
         </View>
-      </View>
-    </LinearGradient>
+      </LinearGradient>
+    </View>
   );
 };
 
@@ -107,7 +113,10 @@ const styles = StyleSheet.create({
     color: colors.primaryText,
     fontSize: 30,
     fontWeight: typography.fontWeight.bold,
-    marginTop: spacing.sm,
+  },
+  balanceAmountContainer: {
+    marginTop: spacing.xs,
+    minHeight: 40,
   },
   balanceHeader: {
     alignItems: 'center',
@@ -123,14 +132,15 @@ const styles = StyleSheet.create({
   },
   balanceSection: {
     paddingBottom: spacing.md,
+    zIndex: 2,
   },
   card: {
     borderColor: colors.white,
     borderRadius: 20,
     borderWidth: 1,
-    marginHorizontal: spacing.lg,
-    marginVertical: spacing.md,
+    overflow: 'hidden',
     padding: spacing.xl,
+    position: 'relative',
     shadowColor: '#172551',
     shadowOffset: {
       height: 4,
@@ -139,23 +149,73 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.07,
     shadowRadius: 6,
   },
+  cardContainer: {
+    marginHorizontal: spacing.lg,
+    marginVertical: spacing.md,
+  },
+  decorativeCircleLeft: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 55,
+    height: 110,
+    left: -9,
+    position: 'absolute',
+    top: 11,
+    width: 110,
+  },
+  decorativeCircleRight: {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 68,
+    height: 136,
+    position: 'absolute',
+    right: -57,
+    top: 24,
+    width: 136,
+  },
   divider: {
     backgroundColor: colors.white,
     height: 1,
     marginVertical: spacing.lg,
     opacity: 0.3,
+    zIndex: 2,
+  },
+  expenseArrow: {
+    color: colors.danger,
+    fontSize: 14,
+    fontWeight: typography.fontWeight.bold,
+  },
+  expenseIconCircle: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderRadius: 8,
+    height: 16,
+    justifyContent: 'center',
+    marginRight: spacing.xs,
+    width: 16,
+  },
+  incomeArrow: {
+    color: colors.success,
+    fontSize: 14,
+    fontWeight: typography.fontWeight.bold,
+  },
+  incomeIconCircle: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(22, 194, 84, 0.1)',
+    borderRadius: 8,
+    height: 16,
+    justifyContent: 'center',
+    marginRight: spacing.xs,
+    width: 16,
   },
   summaryAmount: {
     color: colors.primaryText,
+    flex: 1,
     fontSize: 20,
     fontWeight: typography.fontWeight.medium,
-    marginTop: 4,
   },
   summaryCard: {
     backgroundColor: colors.white,
     borderRadius: 10,
     elevation: 1,
-    flexDirection: 'row',
     padding: spacing.md,
     shadowColor: '#1E2C40',
     shadowOffset: {
@@ -170,19 +230,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingTop: spacing.md,
-  },
-  summaryContent: {
-    flex: 1,
-  },
-  summaryIconContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.sm,
+    zIndex: 2,
   },
   summaryLabel: {
     color: colors.text.secondary,
     fontSize: 12,
     fontWeight: typography.fontWeight.medium,
+    marginBottom: spacing.xs,
+  },
+  summaryRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   visibilityButton: {
     padding: spacing.xs,

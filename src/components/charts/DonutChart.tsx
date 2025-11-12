@@ -159,7 +159,6 @@ const styles = StyleSheet.create({
   },
   legendCategory: {
     color: colors.text.primary,
-    flex: 1,
     fontSize: 14,
     fontWeight: typography.fontWeight.medium,
     marginLeft: spacing.sm,
@@ -180,7 +179,6 @@ const styles = StyleSheet.create({
   },
   legendLeft: {
     alignItems: 'center',
-    flex: 1,
     flexDirection: 'row',
   },
   legendPercentage: {
@@ -192,6 +190,7 @@ const styles = StyleSheet.create({
   legendRight: {
     alignItems: 'center',
     flexDirection: 'row',
+    marginLeft: 'auto',
   },
   title: {
     color: colors.primaryText,

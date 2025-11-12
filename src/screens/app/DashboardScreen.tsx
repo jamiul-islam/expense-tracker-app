@@ -74,20 +74,23 @@ export default function DashboardScreen() {
     const top3 = categoryArray.slice(0, 3);
     const totalOfTop3 = top3.reduce((sum, item) => sum + item.amount, 0);
 
-    // Map categories to their designated colors
+    // Map categories to their designated colors from Figma
     const colorMap: { [key: string]: string } = {
-      Grocery: colors.chart.grocery,
-      Transport: colors.chart.transport,
-      Entertainment: colors.chart.entertainment,
+      Grocery: colors.chart.grocery, // Yellow #F5CD47
+      Transport: colors.chart.transport, // Blue #3D8BFD
+      Entertainment: colors.chart.entertainment, // Purple #B18DFD
       Medicine: colors.chart.medicine,
       Education: colors.chart.education,
+      Dining: colors.chart.shopping, // Use shopping color for dining
+      Utilities: colors.chart.others,
+      // Add more mappings as needed
     };
 
     return top3.map(item => ({
       category: item.category,
       amount: item.amount,
       percentage: totalOfTop3 > 0 ? (item.amount / totalOfTop3) * 100 : 0,
-      color: colorMap[item.category] || colors.chart.grocery,
+      color: colorMap[item.category] || colors.chart.others, // Default to others color
     }));
   };
 
