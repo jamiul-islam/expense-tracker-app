@@ -22,6 +22,10 @@
       },
       "package": "com.tranzo.app"
     },
-    "web": {}
+    "web": {},
+    "extra": {
+      "supabaseUrl": "https://monasdsksemrmxjhhgtp.supabase.co",
+      "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vbmFzZHNrc2Vtcm14amhoZ3RwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY1MTkxMzgsImV4cCI6MjA1MjA5NTEzOH0.6d1k9XfJVK9H_aGNxBYGQcwL13Fxc9dAGMsAeXUOFbw"
+    }
   }
 }
