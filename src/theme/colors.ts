@@ -33,6 +33,8 @@ export const colors = {
     card: '#FFFFFF',
     iconCircle: '#E8E8E8', // From Figma
     activeTab: '#EDF7F7', // Active tab background from Figma
+    gradientStart: '#EDF5FB', // Screen background gradient start (Figma)
+    gradientEnd: '#F7F8FA', // Screen background gradient end (Figma)
   },
 
   // Gradient Colors

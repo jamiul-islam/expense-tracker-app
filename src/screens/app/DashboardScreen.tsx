@@ -3,7 +3,9 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, RefreshControl, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing } from '@/theme';
 import {
   ScreenHeader,
@@ -131,20 +133,27 @@ export default function DashboardScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+    <View style={styles.container}>
+      <LinearGradient
+        colors={[colors.background.gradientStart, colors.background.gradientEnd]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.3, y: 1 }} // Approximates 170deg angle from Figma
+        style={styles.gradient}
       >
-        {/* Header */}
-        <ScreenHeader
-          greeting="Good Morning 👋"
-          userName={user?.full_name || 'User'}
-          avatarUrl={user?.avatar_url}
-          hasNotification={false}
-          onAvatarPress={handleAvatarPress}
-          onNotificationPress={handleNotificationPress}
-        />
+        <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          >
+            {/* Header */}
+            <ScreenHeader
+              greeting="Good Morning 👋"
+              userName={user?.full_name || 'User'}
+              avatarUrl={user?.avatar_url}
+              hasNotification={false}
+              onAvatarPress={handleAvatarPress}
+              onNotificationPress={handleNotificationPress}
+            />
 
         {/* Balance Card */}
         <BalanceCard totalBalance={totalBalance} income={totalIncome} expense={totalExpense} />
@@ -200,7 +209,9 @@ export default function DashboardScreen() {
           )}
         </Card>
       </ScrollView>
-    </SafeAreaView>
+      </SafeAreaView>
+      </LinearGradient>
+    </View>
   );
 }
 
@@ -214,19 +225,18 @@ const formatCurrency = (amount: number): string => {
 const styles = StyleSheet.create({
   arrowIcon: {
     alignItems: 'center',
-    height: 14,
+    // height: 14,
     justifyContent: 'center',
     marginLeft: spacing.xs,
     width: 14,
   },
   arrowText: {
     color: colors.infoBlue,
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: '600',
     transform: [{ rotate: '90deg' }],
   },
   container: {
-    backgroundColor: colors.background.primary,
     flex: 1,
   },
   dateGroup: {
@@ -267,6 +277,9 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     fontSize: 14,
   },
+  gradient: {
+    flex: 1,
+  },
   recentCard: {
     backgroundColor: colors.white,
     borderRadius: 20,
@@ -281,6 +294,9 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.07,
     shadowRadius: 6,
+  },
+  safeArea: {
+    flex: 1,
   },
   sectionHeader: {
     paddingBottom: spacing.sm,

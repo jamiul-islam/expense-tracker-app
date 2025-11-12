@@ -42,16 +42,17 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
 
-  // Calculate stroke offsets for each segment
+  // Calculate stroke offsets for each segment with visible gaps between them
   let currentOffset = 0;
+  const gapSize = circumference * 0.06; // 4% gap between segments for clear visibility
   const segments = data.map(item => {
     const segmentLength = (item.percentage / 100) * circumference;
     const segment = {
       color: item.color,
       offset: currentOffset,
-      length: segmentLength,
+      length: segmentLength - gapSize, // Subtract gap from segment length
     };
-    currentOffset += segmentLength;
+    currentOffset += segmentLength; // Move to next segment position
     return segment;
   });
 

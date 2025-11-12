@@ -111,17 +111,12 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
 const styles = StyleSheet.create({
   balanceAmount: {
     color: colors.primaryText,
-    flexShrink: 1,
-    flexWrap: 'wrap',
     fontSize: 30,
     fontWeight: typography.fontWeight.bold,
+    paddingTop: spacing.sm,
   },
   balanceAmountContainer: {
-    alignItems: 'flex-start',
-    flexDirection: 'row',
     marginTop: spacing.sm,
-    minHeight: 45,
-    paddingRight: spacing.lg,
   },
   balanceHeader: {
     alignItems: 'center',
