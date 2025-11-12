@@ -6,7 +6,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { colors, spacing, borderRadius, typography, shadows } from '@/theme';
 import { Text } from '../common/Text';
 import { Icon } from '../common/Icon';
@@ -62,13 +61,13 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
         </View>
 
         {isBalanceVisible ? (
-          <Animated.View entering={FadeIn.duration(300)} exiting={FadeOut.duration(300)}>
+          <View>
             <Text style={styles.balanceAmount}>{formatCurrency(totalBalance)}</Text>
-          </Animated.View>
+          </View>
         ) : (
-          <Animated.View entering={FadeIn.duration(300)} exiting={FadeOut.duration(300)}>
+          <View>
             <Text style={styles.balanceAmount}>••••••</Text>
-          </Animated.View>
+          </View>
         )}
       </View>
 
