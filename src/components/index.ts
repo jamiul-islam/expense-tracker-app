@@ -6,6 +6,9 @@ export { Icon } from './common/Icon';
 export { LoadingSpinner } from './common/LoadingSpinner';
 export { Text } from './common/Text';
 export { TextInput } from './common/TextInput';
+export { SearchBar } from './common/SearchBar';
+export { FilterButton } from './common/FilterButton';
+export { FAB } from './common/FAB';
 
 // Section Components
 export { BalanceCard } from './sections/BalanceCard';
@@ -15,3 +18,10 @@ export { TransactionList } from './sections/TransactionList';
 
 // Chart Components
 export { DonutChart } from './charts/DonutChart';
+
+// Modals
+export { FilterModal } from './modals/FilterModal';
+export { TransactionDetailsModal } from './modals/TransactionDetailsModal';
+export { AddTransactionModal } from './modals/AddTransactionModal';
+export { EditTransactionModal } from './modals/EditTransactionModal';
+export { DeleteConfirmationModal } from './modals/DeleteConfirmationModal';
