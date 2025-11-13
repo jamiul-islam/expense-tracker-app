@@ -6,9 +6,9 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { View, StyleSheet, SafeAreaView, SectionList, RefreshControl, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, typography, shadows, borderRadius } from '@/theme';
-import { useTransactionStore, useUIStore } from '@/store';
+import { useTransactionStore, useUIStore, useUserStore } from '@/store';
 import type { Transaction } from '@/types/database';
-import { LoadingSpinner } from '@/components';
+import { LoadingSpinner, ScreenHeader } from '@/components';
 import { SearchBar } from '@/components/common/SearchBar';
 import { FilterButton } from '@/components/common/FilterButton';
 import { FAB } from '@/components/common/FAB';
@@ -41,6 +41,7 @@ export const TransactionsScreen: React.FC = () => {
   } = useTransactionStore();
 
   const { openModals, searchQuery, openModal, closeModal, setSearchQuery } = useUIStore();
+  const { user } = useUserStore();
 
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
@@ -204,9 +205,12 @@ export const TransactionsScreen: React.FC = () => {
         style={styles.gradient}
       >
         <SafeAreaView style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Transactions</Text>
-          </View>
+          <ScreenHeader
+            userName="Transactions"
+            avatarUrl={user?.avatar_url}
+            hasNotification={false}
+            hideGreeting
+          />
           <View style={styles.loadingContainer}>
             <LoadingSpinner />
           </View>
@@ -221,9 +225,12 @@ export const TransactionsScreen: React.FC = () => {
       style={styles.gradient}
     >
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Transactions</Text>
-        </View>
+        <ScreenHeader
+          userName="Transactions"
+          avatarUrl={user?.avatar_url}
+          hasNotification={false}
+          hideGreeting
+        />
 
         {/* Search & Filter */}
         <View style={styles.searchContainer}>
@@ -336,16 +343,6 @@ const styles = StyleSheet.create({
   gradient: {
     flex: 1,
   },
-  header: {
-    paddingBottom: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-  },
-  headerTitle: {
-    color: colors.primaryText,
-    fontSize: typography.fontSize.xl,
-    fontWeight: typography.fontWeight.semibold,
-  },
   listContent: {
     flexGrow: 1,
     paddingBottom: spacing.xl,
@@ -393,6 +390,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: borderRadius.lg,
     flex: 1,
+    marginBottom: spacing['2xl'],
     marginHorizontal: spacing.lg,
     marginTop: spacing.md,
     paddingTop: spacing.lg,

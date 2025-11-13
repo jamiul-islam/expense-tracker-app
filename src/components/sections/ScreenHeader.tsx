@@ -16,6 +16,7 @@ interface ScreenHeaderProps {
   hasNotification?: boolean;
   onNotificationPress?: () => void;
   onAvatarPress?: () => void;
+  hideGreeting?: boolean;
 }
 
 export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
@@ -25,11 +26,12 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
   hasNotification = false,
   onNotificationPress,
   onAvatarPress,
+  hideGreeting = false,
 }) => {
   return (
     <View style={styles.container}>
       <View style={styles.leftSection}>
-        <Text style={styles.greeting}>{greeting}</Text>
+        {!hideGreeting && <Text style={styles.greeting}>{greeting}</Text>}
         <Text style={styles.userName}>{userName}</Text>
       </View>
 
