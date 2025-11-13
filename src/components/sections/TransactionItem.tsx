@@ -76,9 +76,7 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: 'center',
-    backgroundColor: colors.background.card,
-    borderBottomColor: colors.background.secondary,
-    borderBottomWidth: 1,
+    backgroundColor: 'transparent',
     flexDirection: 'row',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,

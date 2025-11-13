@@ -4,10 +4,11 @@
 
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { View, StyleSheet, SafeAreaView, SectionList, RefreshControl, Text } from 'react-native';
-import { colors, spacing, typography } from '@/theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { colors, spacing, typography, shadows, borderRadius } from '@/theme';
 import { useTransactionStore, useUIStore } from '@/store';
 import type { Transaction } from '@/types/database';
-import { ScreenHeader, TransactionItem, LoadingSpinner } from '@/components';
+import { LoadingSpinner } from '@/components';
 import { SearchBar } from '@/components/common/SearchBar';
 import { FilterButton } from '@/components/common/FilterButton';
 import { FAB } from '@/components/common/FAB';
@@ -16,6 +17,7 @@ import { TransactionDetailsModal } from '@/components/modals/TransactionDetailsM
 import { AddTransactionModal } from '@/components/modals/AddTransactionModal';
 import { EditTransactionModal } from '@/components/modals/EditTransactionModal';
 import { DeleteConfirmationModal } from '@/components/modals/DeleteConfirmationModal';
+import { TransactionItem } from '@/components/sections/TransactionItem';
 
 interface TransactionSection {
   date: string;
@@ -197,52 +199,70 @@ export const TransactionsScreen: React.FC = () => {
 
   if (isLoading && transactions.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
-        <ScreenHeader title="Transactions" />
-        <View style={styles.loadingContainer}>
-          <LoadingSpinner />
-        </View>
-      </SafeAreaView>
+      <LinearGradient
+        colors={[colors.background.gradientStart, colors.background.gradientEnd]}
+        style={styles.gradient}
+      >
+        <SafeAreaView style={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>Transactions</Text>
+          </View>
+          <View style={styles.loadingContainer}>
+            <LoadingSpinner />
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScreenHeader title="Transactions" />
+    <LinearGradient
+      colors={[colors.background.gradientStart, colors.background.gradientEnd]}
+      style={styles.gradient}
+    >
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Transactions</Text>
+        </View>
 
-      {/* Search & Filter */}
-      <View style={styles.searchContainer}>
-        <SearchBar
-          onSearch={setSearchQuery}
-          placeholder="Search transactions..."
-          containerStyle={styles.searchBar}
-        />
-        <FilterButton
-          hasActiveFilters={hasActiveFilters}
-          onPress={() => openModal('filterTransaction')}
-        />
-      </View>
-
-      {/* Transactions List */}
-      <SectionList
-        sections={sections}
-        keyExtractor={item => item.id}
-        renderItem={renderItem}
-        renderSectionHeader={renderSectionHeader}
-        contentContainerStyle={styles.listContent}
-        stickySectionHeadersEnabled={false}
-        ListEmptyComponent={renderEmptyState}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            tintColor={colors.primary}
+        {/* Search & Filter */}
+        <View style={styles.searchContainer}>
+          <SearchBar
+            onSearch={setSearchQuery}
+            placeholder="Search transaction by title or category"
+            containerStyle={styles.searchBar}
           />
-        }
-      />
+          <FilterButton
+            hasActiveFilters={hasActiveFilters}
+            onPress={() => openModal('filterTransaction')}
+          />
+        </View>
 
-      {/* Floating Action Button */}
-      <FAB icon="add" onPress={() => openModal('addTransaction')} />
+        {/* Transactions Card */}
+        <View style={styles.transactionsCard}>
+          <Text style={styles.cardTitle}>Transactions</Text>
+          {/* Transactions List */}
+          <SectionList
+            sections={sections}
+            keyExtractor={item => item.id}
+            renderItem={renderItem}
+            renderSectionHeader={renderSectionHeader}
+            contentContainerStyle={styles.listContent}
+            stickySectionHeadersEnabled={false}
+            ListEmptyComponent={renderEmptyState}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                tintColor={colors.primary}
+              />
+            }
+          />
+        </View>
+
+        {/* Floating Action Button */}
+        <FAB icon="add" onPress={() => openModal('addTransaction')} />
+      </SafeAreaView>
 
       {/* Modals */}
       <FilterModal
@@ -280,13 +300,19 @@ export const TransactionsScreen: React.FC = () => {
         onClose={() => closeModal('deleteConfirmation')}
         onConfirm={handleConfirmDelete}
       />
-    </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
+  cardTitle: {
+    color: colors.primaryText,
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.medium,
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.lg,
+  },
   container: {
-    backgroundColor: colors.background.primary,
     flex: 1,
   },
   emptyState: {
@@ -307,10 +333,22 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.medium,
     textAlign: 'center',
   },
+  gradient: {
+    flex: 1,
+  },
+  header: {
+    paddingBottom: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+  },
+  headerTitle: {
+    color: colors.primaryText,
+    fontSize: typography.fontSize.xl,
+    fontWeight: typography.fontWeight.semibold,
+  },
   listContent: {
     flexGrow: 1,
-    paddingBottom: spacing['4xl'] + 68,
-    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
   },
   loadingContainer: {
     alignItems: 'center',
@@ -327,27 +365,38 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   sectionDate: {
-    color: colors.text.primary,
+    color: colors.text.secondary,
     fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.semibold,
+    fontWeight: typography.fontWeight.medium,
+    textTransform: 'uppercase',
   },
   sectionHeader: {
     alignItems: 'center',
-    backgroundColor: colors.background.primary,
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingBottom: spacing.sm,
+    paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
   },
   sectionTotal: {
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.semibold,
+    color: colors.text.dailyTotal,
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.medium,
   },
   sectionTotalNegative: {
-    color: colors.danger,
+    color: colors.text.dailyTotal,
   },
   sectionTotalPositive: {
-    color: colors.success,
+    color: colors.text.dailyTotal,
+  },
+  transactionsCard: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    flex: 1,
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.md,
+    paddingTop: spacing.lg,
+    ...shadows.card,
   },
 });
 
