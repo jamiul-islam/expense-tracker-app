@@ -358,7 +358,8 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     gap: spacing.md,
-    paddingBottom: spacing.md,
+    marginTop: spacing.md,
+    paddingBottom: spacing.sm,
     paddingHorizontal: spacing.lg,
   },
   sectionDate: {
@@ -390,7 +391,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: borderRadius.lg,
     flex: 1,
-    marginBottom: spacing['2xl'],
+    marginBottom: spacing.xl,
     marginHorizontal: spacing.lg,
     marginTop: spacing.md,
     paddingTop: spacing.lg,
