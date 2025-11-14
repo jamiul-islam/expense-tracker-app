@@ -369,8 +369,9 @@ const styles = StyleSheet.create({
   },
   applyButton: {
     backgroundColor: colors.primary,
-    borderRadius: borderRadius.md,
+    borderRadius: 25,
     flex: 1,
+    paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
   applyButtonText: {
