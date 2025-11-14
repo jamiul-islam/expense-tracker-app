@@ -280,27 +280,38 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     ]}
                   />
                   
-                  {/* Min value slider */}
-                  <Slider
-                    style={styles.minSlider}
-                    minimumValue={150}
-                    maximumValue={amountMax - 10}
-                    value={amountMin}
-                    onValueChange={(value) => setAmountMin(Math.min(value, amountMax - 10))}
-                    minimumTrackTintColor="transparent"
-                    maximumTrackTintColor="transparent"
-                  />
-                  
-                  {/* Max value slider */}
-                  <Slider
-                    style={styles.maxSlider}
-                    minimumValue={amountMin + 10}
-                    maximumValue={500}
-                    value={amountMax}
-                    onValueChange={(value) => setAmountMax(Math.max(value, amountMin + 10))}
-                    minimumTrackTintColor="transparent"
-                    maximumTrackTintColor="transparent"
-                  />
+                  {/* Split interaction areas for both sliders */}
+                  <View style={styles.sliderContainer}>
+                    {/* Min value slider - positioned on left side */}
+                    <View style={[styles.sliderWrapper, { 
+                      width: `${50 + ((amountMin - 150) / 350) * 50}%` 
+                    }]}>
+                      <Slider
+                        style={styles.sliderComponent}
+                        minimumValue={150}
+                        maximumValue={amountMax - 10}
+                        value={amountMin}
+                        onValueChange={(value) => setAmountMin(Math.min(value, amountMax - 10))}
+                        minimumTrackTintColor="transparent"
+                        maximumTrackTintColor="transparent"
+                      />
+                    </View>
+                    
+                    {/* Max value slider - positioned on right side */}
+                    <View style={[styles.sliderWrapper, styles.sliderWrapperRight, { 
+                      width: `${50 + ((500 - amountMax) / 350) * 50}%`
+                    }]}>
+                      <Slider
+                        style={styles.sliderComponent}
+                        minimumValue={amountMin + 10}
+                        maximumValue={500}
+                        value={amountMax}
+                        onValueChange={(value) => setAmountMax(Math.max(value, amountMin + 10))}
+                        minimumTrackTintColor="transparent"
+                        maximumTrackTintColor="transparent"
+                      />
+                    </View>
+                  </View>
                 </View>
                 <View style={styles.amountLabels}>
                   <Text style={styles.amountLabel}>${Math.round(amountMin)}</Text>
@@ -528,24 +539,6 @@ const styles = StyleSheet.create({
   lastSection: {
     marginBottom: spacing.md,
   },
-  maxSlider: {
-    height: 40,
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    width: '100%',
-    zIndex: 2,
-  },
-  minSlider: {
-    height: 40,
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    width: '100%',
-    zIndex: 1,
-  },
   modalContainer: {
     backgroundColor: colors.white,
     borderTopLeftRadius: 26,
@@ -603,6 +596,17 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     textTransform: 'uppercase',
   },
+  sliderComponent: {
+    height: 40,
+    width: '100%',
+  },
+  sliderContainer: {
+    height: 40,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
   sliderTrackActive: {
     backgroundColor: colors.primary,
     borderRadius: 2,
@@ -618,6 +622,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     top: 18,
+  },
+  sliderWrapper: {
+    height: 40,
+    position: 'absolute',
+    top: 0,
+  },
+  sliderWrapperRight: {
+    left: 'auto',
+    right: 0,
   },
   title: {
     color: colors.text.primary,
