@@ -6,7 +6,6 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '@/theme';
-import { Button } from '@/components/common/Button';
 
 interface FilterModalProps {
   visible: boolean;
@@ -51,18 +50,19 @@ export const FilterModal: React.FC<FilterModalProps> = ({
 }) => {
   const [type, setType] = useState<'all' | 'income' | 'expense'>(initialFilters?.type || 'all');
   const [category, setCategory] = useState<string>(initialFilters?.category || 'all');
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState<boolean>(false);
   const [dateRange, setDateRange] = useState<string>('month');
   const [dateFrom, setDateFrom] = useState<Date | undefined>(initialFilters?.dateFrom);
   const [dateTo, setDateTo] = useState<Date | undefined>(initialFilters?.dateTo);
-  const [amountMin, setAmountMin] = useState<number>(initialFilters?.amountMin || 0);
-  const [amountMax, setAmountMax] = useState<number>(initialFilters?.amountMax || 5000);
+  const [amountMin, setAmountMin] = useState<number>(initialFilters?.amountMin || 150);
+  const [amountMax, setAmountMax] = useState<number>(initialFilters?.amountMax || 500);
 
   useEffect(() => {
     if (initialFilters) {
       setType(initialFilters.type || 'all');
       setCategory(initialFilters.category || 'all');
-      setAmountMin(initialFilters.amountMin || 0);
-      setAmountMax(initialFilters.amountMax || 5000);
+      setAmountMin(initialFilters.amountMin || 150);
+      setAmountMax(initialFilters.amountMax || 500);
       setDateFrom(initialFilters.dateFrom);
       setDateTo(initialFilters.dateTo);
     }
@@ -104,8 +104,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({
       category: category === 'all' ? undefined : category,
       dateFrom,
       dateTo,
-      amountMin: amountMin > 0 ? amountMin : undefined,
-      amountMax: amountMax < 5000 ? amountMax : undefined,
+      amountMin: amountMin > 150 ? amountMin : undefined,
+      amountMax: amountMax < 500 ? amountMax : undefined,
     };
     onApply(filters);
     onClose();
@@ -114,9 +114,10 @@ export const FilterModal: React.FC<FilterModalProps> = ({
   const handleClearFilters = useCallback(() => {
     setType('all');
     setCategory('all');
+    setCategoryDropdownOpen(false);
     setDateRange('month');
-    setAmountMin(0);
-    setAmountMax(5000);
+    setAmountMin(150);
+    setAmountMax(500);
     setDateFrom(undefined);
     setDateTo(undefined);
   }, []);
@@ -139,80 +140,52 @@ export const FilterModal: React.FC<FilterModalProps> = ({
           </View>
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-            {/* Transaction Type */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Transaction Type</Text>
-              <View style={styles.typeContainer}>
-                {(['all', 'income', 'expense'] as const).map(t => (
-                  <TouchableOpacity
-                    key={t}
-                    style={[styles.typeButton, type === t && styles.typeButtonActive]}
-                    onPress={() => setType(t)}
-                  >
-                    <Text
-                      style={[styles.typeButtonText, type === t && styles.typeButtonTextActive]}
-                    >
-                      {t.charAt(0).toUpperCase() + t.slice(1)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            {/* Category */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Category</Text>
-              <View style={styles.categoryGrid}>
-                {CATEGORIES.map(cat => (
-                  <TouchableOpacity
-                    key={cat.id}
-                    style={[
-                      styles.categoryButton,
-                      category === cat.id && styles.categoryButtonActive,
-                    ]}
-                    onPress={() => setCategory(cat.id)}
-                  >
-                    <Ionicons
-                      name={cat.icon as keyof typeof Ionicons.glyphMap}
-                      size={20}
-                      color={category === cat.id ? colors.primary : colors.text.tertiary}
-                    />
-                    <Text
-                      style={[
-                        styles.categoryButtonText,
-                        category === cat.id && styles.categoryButtonTextActive,
-                      ]}
-                    >
-                      {cat.name}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
             {/* Date Range */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Date Range</Text>
               <View style={styles.dateRangeContainer}>
-                {DATE_RANGES.map(range => (
-                  <TouchableOpacity
-                    key={range.id}
-                    style={[
-                      styles.dateRangeButton,
-                      dateRange === range.id && styles.dateRangeButtonActive,
-                    ]}
-                    onPress={() => handleDateRangeChange(range.id)}
-                  >
-                    <Text
+                <View style={styles.dateRangeRow}>
+                  {DATE_RANGES.slice(0, 3).map(range => (
+                    <TouchableOpacity
+                      key={range.id}
                       style={[
-                        styles.dateRangeButtonText,
-                        dateRange === range.id && styles.dateRangeButtonTextActive,
+                        styles.dateRangeButton,
+                        dateRange === range.id && styles.dateRangeButtonActive,
                       ]}
+                      onPress={() => handleDateRangeChange(range.id)}
                     >
-                      {range.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                      <Text
+                        style={[
+                          styles.dateRangeButtonText,
+                          dateRange === range.id && styles.dateRangeButtonTextActive,
+                        ]}
+                      >
+                        {range.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                <View style={styles.dateRangeRow}>
+                  {DATE_RANGES.slice(3).map(range => (
+                    <TouchableOpacity
+                      key={range.id}
+                      style={[
+                        styles.dateRangeButton,
+                        dateRange === range.id && styles.dateRangeButtonActive,
+                      ]}
+                      onPress={() => handleDateRangeChange(range.id)}
+                    >
+                      <Text
+                        style={[
+                          styles.dateRangeButtonText,
+                          dateRange === range.id && styles.dateRangeButtonTextActive,
+                        ]}
+                      >
+                        {range.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </View>
 
               {dateRange === 'custom' && (
@@ -229,39 +202,109 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               )}
             </View>
 
+            {/* Category */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Category</Text>
+              <TouchableOpacity
+                style={styles.categoryDropdown}
+                onPress={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
+              >
+                <Text style={styles.categoryDropdownText}>
+                  {CATEGORIES.find(cat => cat.id === category)?.name || 'Choose category (s)'}
+                </Text>
+                <Ionicons
+                  name={categoryDropdownOpen ? 'chevron-up' : 'chevron-down'}
+                  size={20}
+                  color={colors.text.tertiary}
+                />
+              </TouchableOpacity>
+
+              {categoryDropdownOpen && (
+                <View style={styles.categoryDropdownList}>
+                  <ScrollView style={styles.categoryScrollView} nestedScrollEnabled>
+                    {CATEGORIES.map(cat => (
+                      <TouchableOpacity
+                        key={cat.id}
+                        style={[
+                          styles.categoryDropdownItem,
+                          category === cat.id && styles.categoryDropdownItemActive,
+                        ]}
+                        onPress={() => {
+                          setCategory(cat.id);
+                          setCategoryDropdownOpen(false);
+                        }}
+                      >
+                        <View style={styles.categoryItemContent}>
+                          <Ionicons
+                            name={cat.icon as keyof typeof Ionicons.glyphMap}
+                            size={20}
+                            color={category === cat.id ? colors.primary : colors.text.tertiary}
+                            style={styles.categoryIcon}
+                          />
+                          <Text
+                            style={[
+                              styles.categoryItemText,
+                              category === cat.id && styles.categoryItemTextActive,
+                            ]}
+                          >
+                            {cat.name}
+                          </Text>
+                        </View>
+                        {category === cat.id && (
+                          <Ionicons name="checkmark" size={20} color={colors.primary} />
+                        )}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+
             {/* Amount Range */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Amount Range</Text>
               <View style={styles.amountContainer}>
-                <Text style={styles.amountLabel}>
-                  ${amountMin.toFixed(0)} - ${amountMax.toFixed(0)}
-                </Text>
-                <View style={styles.amountInputContainer}>
-                  <View style={styles.amountInputWrapper}>
-                    <Text style={styles.amountInputLabel}>Min: ${amountMin}</Text>
-                  </View>
-                  <View style={styles.amountInputWrapper}>
-                    <Text style={styles.amountInputLabel}>Max: ${amountMax}</Text>
+                <View style={styles.sliderContainer}>
+                  <View style={styles.sliderTrackBackground}>
+                    <View style={styles.sliderTrackActive} />
+                    <View style={[styles.sliderThumb, styles.sliderThumbMin]} />
+                    <View style={[styles.sliderThumb, styles.sliderThumbMax]} />
                   </View>
                 </View>
+                <View style={styles.amountLabels}>
+                  <Text style={styles.amountLabel}>$150</Text>
+                  <Text style={styles.amountLabel}>$500</Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Transaction Type */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Transaction Type</Text>
+              <View style={styles.transactionTypeContainer}>
+                {(['all', 'income', 'expense'] as const).map(t => (
+                  <View key={t} style={styles.radioContainer}>
+                    <TouchableOpacity
+                      style={[styles.radioButton, type === t && styles.radioButtonActive]}
+                      onPress={() => setType(t)}
+                    >
+                      {type === t && <View style={styles.radioButtonInner} />}
+                    </TouchableOpacity>
+                    <Text style={styles.radioLabel}>{t.charAt(0).toUpperCase() + t.slice(1)}</Text>
+                  </View>
+                ))}
               </View>
             </View>
           </ScrollView>
 
           {/* Actions */}
           <View style={styles.actions}>
-            <Button
-              title="Clear Filters"
-              variant="secondary"
-              onPress={handleClearFilters}
-              style={styles.actionButton}
-            />
-            <Button
-              title="Apply Filters"
-              variant="primary"
-              onPress={handleApply}
-              style={styles.actionButton}
-            />
+            <TouchableOpacity style={styles.clearButton} onPress={handleClearFilters}>
+              <Text style={styles.clearButtonText}>Clear Filter</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
+              <Text style={styles.applyButtonText}>Apply filter</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -270,12 +313,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
 };
 
 const styles = StyleSheet.create({
-  actionButton: {
-    flex: 1,
-  },
   actions: {
-    borderTopColor: colors.border,
-    borderTopWidth: 1,
     flexDirection: 'row',
     gap: spacing.md,
     paddingHorizontal: spacing.lg,
@@ -284,59 +322,101 @@ const styles = StyleSheet.create({
   amountContainer: {
     paddingTop: spacing.sm,
   },
-  amountInputContainer: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginTop: spacing.sm,
-  },
-  amountInputLabel: {
-    color: colors.text.secondary,
+  amountLabel: {
+    color: colors.text.percentage,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.medium,
   },
-  amountInputWrapper: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
-    flex: 1,
+  amountLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: spacing.sm,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
   },
-  amountLabel: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.base,
+  applyButton: {
+    alignItems: 'center',
+    backgroundColor: colors.primaryText,
+    borderRadius: 58,
+    flex: 1,
+    height: 44,
+    justifyContent: 'center',
+  },
+  applyButtonText: {
+    color: colors.white,
+    fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.semibold,
-    marginBottom: spacing.sm,
-    textAlign: 'center',
   },
-  categoryButton: {
+  categoryDropdown: {
     alignItems: 'center',
     backgroundColor: colors.white,
     borderColor: colors.border,
     borderRadius: borderRadius.md,
     borderWidth: 1,
     flexDirection: 'row',
-    gap: spacing.sm,
+    height: 48,
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.lg,
+  },
+  categoryDropdownItem: {
+    alignItems: 'center',
+    borderBottomColor: colors.background.secondary,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
-    width: '48%',
   },
-  categoryButtonActive: {
+  categoryDropdownItemActive: {
     backgroundColor: colors.background.activeTab,
-    borderColor: colors.primary,
   },
-  categoryButtonText: {
-    color: colors.text.tertiary,
+  categoryDropdownList: {
+    backgroundColor: colors.white,
+    borderColor: colors.border,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    marginTop: spacing.xs,
+    maxHeight: 200,
+    ...shadows.sm,
+  },
+  categoryDropdownText: {
+    color: colors.text.primary,
     fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.medium,
+    fontWeight: typography.fontWeight.regular,
   },
-  categoryButtonTextActive: {
+  categoryIcon: {
+    marginRight: spacing.sm,
+  },
+  categoryItemContent: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    flex: 1,
+  },
+  categoryItemText: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.regular,
+  },
+  categoryItemTextActive: {
     color: colors.primary,
     fontWeight: typography.fontWeight.semibold,
   },
-  categoryGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
+  categoryScrollView: {
+    maxHeight: 180,
+  },
+  clearButton: {
+    alignItems: 'center',
+    borderColor: colors.primaryText,
+    borderRadius: 58,
+    borderWidth: 1,
+    height: 44,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+  },
+  clearButtonText: {
+    color: colors.primaryText,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.semibold,
   },
   closeButton: {
     padding: spacing.xs,
@@ -371,10 +451,12 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.semibold,
   },
   dateRangeButton: {
+    alignItems: 'center',
     backgroundColor: colors.white,
-    borderColor: colors.border,
+    borderColor: 'rgba(0,0,0,0.1)',
     borderRadius: borderRadius.pill,
     borderWidth: 1,
+    flex: 1,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
   },
@@ -383,17 +465,19 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
   },
   dateRangeButtonText: {
-    color: colors.text.tertiary,
+    color: colors.primaryText,
     fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.medium,
+    fontWeight: typography.fontWeight.regular,
   },
   dateRangeButtonTextActive: {
     color: colors.primary,
     fontWeight: typography.fontWeight.semibold,
   },
   dateRangeContainer: {
+    gap: spacing.sm,
+  },
+  dateRangeRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: spacing.sm,
   },
   header: {
@@ -407,56 +491,102 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: colors.white,
-    borderTopLeftRadius: borderRadius.lg,
-    borderTopRightRadius: borderRadius.lg,
+    borderTopLeftRadius: 26,
+    borderTopRightRadius: 26,
     height: '85%',
     marginTop: 'auto',
     ...shadows.card,
   },
   overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(9, 36, 73, 0.21)',
     flex: 1,
     justifyContent: 'flex-end',
+  },
+  radioButton: {
+    alignItems: 'center',
+    borderColor: colors.text.tertiary,
+    borderRadius: 12,
+    borderWidth: 2,
+    height: 24,
+    justifyContent: 'center',
+    marginRight: spacing.sm,
+    width: 24,
+  },
+  radioButtonActive: {
+    borderColor: colors.primary,
+  },
+  radioButtonInner: {
+    backgroundColor: colors.primary,
+    borderRadius: 6,
+    height: 12,
+    width: 12,
+  },
+  radioContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginRight: spacing['2xl'],
+  },
+  radioLabel: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.regular,
   },
   section: {
     marginBottom: spacing['2xl'],
   },
   sectionTitle: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.base,
+    color: colors.text.secondary,
+    fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.semibold,
     marginBottom: spacing.md,
+    textTransform: 'uppercase',
+  },
+  sliderContainer: {
+    height: 40,
+    justifyContent: 'center',
+    marginVertical: spacing.md,
+    paddingHorizontal: 14,
+    position: 'relative',
+  },
+  sliderThumb: {
+    backgroundColor: colors.primary,
+    borderRadius: 14,
+    height: 28,
+    marginLeft: -14,
+    position: 'absolute',
+    top: -10,
+    width: 28,
+    ...shadows.sm,
+  },
+  sliderThumbMax: {
+    left: 186,
+  },
+  sliderThumbMin: {
+    left: 52,
+  },
+  sliderTrackActive: {
+    backgroundColor: colors.primary,
+    borderRadius: 4,
+    height: 8,
+    left: 48,
+    position: 'absolute',
+    width: 136,
+  },
+  sliderTrackBackground: {
+    backgroundColor: 'rgba(12, 39, 65, 0.14)',
+    borderRadius: 40,
+    height: 8,
+    position: 'relative',
+    width: '100%',
   },
   title: {
     color: colors.text.primary,
-    fontSize: typography.fontSize.xl,
-    fontWeight: typography.fontWeight.semibold,
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.bold,
   },
-  typeButton: {
+  transactionTypeContainer: {
     alignItems: 'center',
-    backgroundColor: colors.white,
-    borderColor: colors.border,
-    borderRadius: borderRadius.pill,
-    borderWidth: 1,
-    flex: 1,
-    paddingVertical: spacing.md,
-  },
-  typeButtonActive: {
-    backgroundColor: colors.background.activeTab,
-    borderColor: colors.primary,
-  },
-  typeButtonText: {
-    color: colors.text.tertiary,
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.medium,
-  },
-  typeButtonTextActive: {
-    color: colors.primary,
-    fontWeight: typography.fontWeight.semibold,
-  },
-  typeContainer: {
     flexDirection: 'row',
-    gap: spacing.sm,
   },
 });
 
