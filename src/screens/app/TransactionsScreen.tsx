@@ -12,7 +12,7 @@ import { LoadingSpinner, ScreenHeader } from '@/components';
 import { SearchBar } from '@/components/common/SearchBar';
 import { FilterButton } from '@/components/common/FilterButton';
 import { FAB } from '@/components/common/FAB';
-import { FilterModal } from '@/components/modals/FilterModal';
+import { FilterModal, FilterOptions } from '@/components/modals/FilterModal';
 import { TransactionDetailsModal } from '@/components/modals/TransactionDetailsModal';
 import { AddTransactionModal } from '@/components/modals/AddTransactionModal';
 import { EditTransactionModal } from '@/components/modals/EditTransactionModal';
@@ -45,6 +45,24 @@ export const TransactionsScreen: React.FC = () => {
 
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
+
+  // Convert FilterOptions to TransactionFilters
+  const convertFilterOptions = useCallback((filterOptions: FilterOptions) => {
+    return {
+      type: filterOptions.type === 'all' ? undefined : filterOptions.type,
+      category: filterOptions.category === 'all' ? undefined : filterOptions.category,
+      dateFrom: filterOptions.dateFrom,
+      dateTo: filterOptions.dateTo,
+      amountMin: filterOptions.amountMin,
+      amountMax: filterOptions.amountMax,
+    };
+  }, []);
+
+  // Handle filter application
+  const handleApplyFilters = useCallback((filterOptions: FilterOptions) => {
+    const transactionFilters = convertFilterOptions(filterOptions);
+    setFilters(transactionFilters);
+  }, [convertFilterOptions, setFilters]);
 
   // Fetch transactions on mount
   useEffect(() => {
@@ -93,12 +111,13 @@ export const TransactionsScreen: React.FC = () => {
 
   // Check if there are active filters
   const hasActiveFilters = useMemo(() => {
-    return (
-      filters.type !== 'all' ||
-      filters.category !== 'all' ||
-      filters.dateRange !== 'all' ||
-      filters.amountMin !== 0 ||
-      filters.amountMax !== 10000
+    return Boolean(
+      filters.type ||
+      filters.category ||
+      filters.dateFrom ||
+      filters.dateTo ||
+      (filters.amountMin !== undefined && filters.amountMin > 0) ||
+      (filters.amountMax !== undefined && filters.amountMax < 10000)
     );
   }, [filters]);
 
@@ -274,10 +293,8 @@ export const TransactionsScreen: React.FC = () => {
       {/* Modals */}
       <FilterModal
         visible={openModals.has('filterTransaction')}
-        filters={filters}
         onClose={() => closeModal('filterTransaction')}
-        onApply={setFilters}
-        onClear={clearFilters}
+        onApply={handleApplyFilters}
       />
 
       <TransactionDetailsModal
@@ -292,6 +309,7 @@ export const TransactionsScreen: React.FC = () => {
         visible={openModals.has('addTransaction')}
         onClose={() => closeModal('addTransaction')}
         onAdd={addTransaction}
+        userId={user?.id || ''}
       />
 
       <EditTransactionModal
@@ -303,7 +321,6 @@ export const TransactionsScreen: React.FC = () => {
 
       <DeleteConfirmationModal
         visible={openModals.has('deleteConfirmation')}
-        isDeleting={isDeleting}
         onClose={() => closeModal('deleteConfirmation')}
         onConfirm={handleConfirmDelete}
       />
@@ -326,7 +343,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing['2xl'],
-    paddingTop: spacing['4xl'],
+    paddingTop: spacing['3xl'],
   },
   emptyStateSubtext: {
     color: colors.text.tertiary,

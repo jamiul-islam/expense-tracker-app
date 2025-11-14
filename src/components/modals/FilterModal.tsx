@@ -18,8 +18,8 @@ interface FilterModalProps {
 export interface FilterOptions {
   type?: 'all' | 'income' | 'expense';
   category?: string;
-  dateFrom?: Date;
-  dateTo?: Date;
+  dateFrom?: string; // Changed to string for consistency
+  dateTo?: string;   // Changed to string for consistency
   amountMin?: number;
   amountMax?: number;
 }
@@ -53,8 +53,12 @@ export const FilterModal: React.FC<FilterModalProps> = ({
   const [category, setCategory] = useState<string>(initialFilters?.category || 'all');
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState<boolean>(false);
   const [dateRange, setDateRange] = useState<string>('month');
-  const [dateFrom, setDateFrom] = useState<Date | undefined>(initialFilters?.dateFrom);
-  const [dateTo, setDateTo] = useState<Date | undefined>(initialFilters?.dateTo);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(
+    initialFilters?.dateFrom ? new Date(initialFilters.dateFrom) : undefined
+  );
+  const [dateTo, setDateTo] = useState<Date | undefined>(
+    initialFilters?.dateTo ? new Date(initialFilters.dateTo) : undefined
+  );
   const [amountMin, setAmountMin] = useState<number>(initialFilters?.amountMin || 150);
   const [amountMax, setAmountMax] = useState<number>(initialFilters?.amountMax || 500);
 
@@ -64,8 +68,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({
       setCategory(initialFilters.category || 'all');
       setAmountMin(initialFilters.amountMin || 150);
       setAmountMax(initialFilters.amountMax || 500);
-      setDateFrom(initialFilters.dateFrom);
-      setDateTo(initialFilters.dateTo);
+      setDateFrom(initialFilters.dateFrom ? new Date(initialFilters.dateFrom) : undefined);
+      setDateTo(initialFilters.dateTo ? new Date(initialFilters.dateTo) : undefined);
     }
   }, [initialFilters]);
 
@@ -103,8 +107,8 @@ export const FilterModal: React.FC<FilterModalProps> = ({
     const filters: FilterOptions = {
       type: type === 'all' ? undefined : type,
       category: category === 'all' ? undefined : category,
-      dateFrom,
-      dateTo,
+      dateFrom: dateFrom ? dateFrom.toISOString().split('T')[0] : undefined,
+      dateTo: dateTo ? dateTo.toISOString().split('T')[0] : undefined,
       amountMin: amountMin > 150 ? amountMin : undefined,
       amountMax: amountMax < 500 ? amountMax : undefined,
     };
@@ -280,9 +284,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     ]}
                   />
                   
-                  {/* Invisible overlay sliders for precise interaction */}
+                  {/* Min value slider */}
                   <Slider
-                    style={styles.invisibleSliderMin}
+                    style={styles.minSlider}
                     minimumValue={150}
                     maximumValue={amountMax - 10}
                     value={amountMin}
@@ -291,8 +295,9 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                     maximumTrackTintColor="transparent"
                   />
                   
+                  {/* Max value slider */}
                   <Slider
-                    style={styles.invisibleSliderMax}
+                    style={styles.maxSlider}
                     minimumValue={amountMin + 10}
                     maximumValue={500}
                     value={amountMax}
@@ -367,14 +372,6 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     flex: 1,
     paddingVertical: spacing.md,
-  },
-  applyButton: {
-    alignItems: 'center',
-    backgroundColor: colors.primaryText,
-    borderRadius: 58,
-    flex: 1,
-    height: 44,
-    justifyContent: 'center',
   },
   applyButtonText: {
     color: colors.white,
@@ -524,34 +521,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.lg,
   },
-  invisibleSliderMax: {
+  lastSection: {
+    marginBottom: spacing.md,
+  },
+  maxSlider: {
     height: 40,
     left: 0,
-    opacity: 0,
     position: 'absolute',
     right: 0,
     top: 0,
     width: '100%',
     zIndex: 2,
   },
-  invisibleSliderMin: {
+  minSlider: {
     height: 40,
     left: 0,
-    opacity: 0,
     position: 'absolute',
     right: 0,
     top: 0,
     width: '100%',
     zIndex: 1,
   },
-  lastSection: {
-    marginBottom: spacing.md,
-  },
   modalContainer: {
     backgroundColor: colors.white,
     borderTopLeftRadius: 26,
     borderTopRightRadius: 26,
-    height: '60%',
+    height: '70%',
     marginTop: 'auto',
     ...shadows.card,
   },
@@ -602,6 +597,7 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.semibold,
     marginBottom: spacing.md,
+    marginTop: spacing.sm,
     textTransform: 'uppercase',
   },
   sliderTrackActive: {
