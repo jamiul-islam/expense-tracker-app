@@ -266,66 +266,41 @@ export const FilterModal: React.FC<FilterModalProps> = ({
               <Text style={styles.sectionTitle}>Amount Range</Text>
               <View style={styles.amountContainer}>
                 <View style={styles.rangeSliderContainer}>
-                  <View style={styles.sliderTrackBackground}>
-                    <View
-                      style={[
-                        styles.sliderTrackActive,
-                        {
-                          left: `${((amountMin - 150) / 350) * 100}%`,
-                          width: `${((amountMax - amountMin) / 350) * 100}%`,
-                        },
-                      ]}
-                    />
-                  </View>
+                  {/* Background track */}
+                  <View style={styles.sliderTrackBackground} />
                   
-                  {/* Left thumb for min value */}
+                  {/* Active track - positioned absolutely */}
                   <View
                     style={[
-                      styles.sliderThumb,
+                      styles.sliderTrackActive,
                       {
                         left: `${((amountMin - 150) / 350) * 100}%`,
+                        width: `${((amountMax - amountMin) / 350) * 100}%`,
                       },
                     ]}
                   />
                   
-                  {/* Right thumb for max value */}
-                  <View
-                    style={[
-                      styles.sliderThumb,
-                      {
-                        left: `${((amountMax - 150) / 350) * 100}%`,
-                      },
-                    ]}
+                  {/* Min value slider */}
+                  <Slider
+                    style={styles.minSlider}
+                    minimumValue={150}
+                    maximumValue={amountMax - 10}
+                    value={amountMin}
+                    onValueChange={(value) => setAmountMin(Math.min(value, amountMax - 10))}
+                    minimumTrackTintColor="transparent"
+                    maximumTrackTintColor="transparent"
                   />
                   
-                  {/* Split slider areas */}
-                  <View style={styles.sliderAreas}>
-                    {/* Min slider - covers left portion */}
-                    <View style={[styles.sliderArea, { flex: (amountMin - 150) + 25 }]}>
-                      <Slider
-                        style={styles.areaSlider}
-                        minimumValue={150}
-                        maximumValue={amountMax - 10}
-                        value={amountMin}
-                        onValueChange={(value) => setAmountMin(Math.min(value, amountMax - 10))}
-                        minimumTrackTintColor="transparent"
-                        maximumTrackTintColor="transparent"
-                      />
-                    </View>
-                    
-                    {/* Max slider - covers right portion */}
-                    <View style={[styles.sliderArea, { flex: (500 - amountMax) + 25 }]}>
-                      <Slider
-                        style={styles.areaSlider}
-                        minimumValue={amountMin + 10}
-                        maximumValue={500}
-                        value={amountMax}
-                        onValueChange={(value) => setAmountMax(Math.max(value, amountMin + 10))}
-                        minimumTrackTintColor="transparent"
-                        maximumTrackTintColor="transparent"
-                      />
-                    </View>
-                  </View>
+                  {/* Max value slider */}
+                  <Slider
+                    style={styles.maxSlider}
+                    minimumValue={amountMin + 10}
+                    maximumValue={500}
+                    value={amountMax}
+                    onValueChange={(value) => setAmountMax(Math.max(value, amountMin + 10))}
+                    minimumTrackTintColor="transparent"
+                    maximumTrackTintColor="transparent"
+                  />
                 </View>
                 <View style={styles.amountLabels}>
                   <Text style={styles.amountLabel}>${Math.round(amountMin)}</Text>
@@ -406,10 +381,6 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.semibold,
-  },
-  areaSlider: {
-    height: 40,
-    width: '100%',
   },
   categoryDropdown: {
     alignItems: 'center',
@@ -557,6 +528,24 @@ const styles = StyleSheet.create({
   lastSection: {
     marginBottom: spacing.md,
   },
+  maxSlider: {
+    height: 40,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    width: '100%',
+    zIndex: 2,
+  },
+  minSlider: {
+    height: 40,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    width: '100%',
+    zIndex: 1,
+  },
   modalContainer: {
     backgroundColor: colors.white,
     borderTopLeftRadius: 26,
@@ -614,33 +603,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     textTransform: 'uppercase',
   },
-  sliderArea: {
-    height: 40,
-  },
-  sliderAreas: {
-    flexDirection: 'row',
-    height: 40,
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
-  },
-  sliderThumb: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    height: 16,
-    marginLeft: -8,
-    position: 'absolute',
-    top: -6,
-    width: 16,
-    ...shadows.sm,
-  },
   sliderTrackActive: {
     backgroundColor: colors.primary,
     borderRadius: 2,
     height: 4,
     position: 'absolute',
-    top: 0,
+    top: 18,
   },
   sliderTrackBackground: {
     backgroundColor: '#e5e7eb',
