@@ -47,24 +47,28 @@ export const useTransactionStore = create<TransactionState>(set => ({
     try {
       let query = supabase.from('transactions').select('*').order('date', { ascending: false });
 
+      // Use provided filters or fall back to store filters
+      const state = useTransactionStore.getState();
+      const activeFilters = filters || state.filters;
+
       // Apply filters
-      if (filters?.type) {
-        query = query.eq('type', filters.type);
+      if (activeFilters?.type) {
+        query = query.eq('type', activeFilters.type);
       }
-      if (filters?.category) {
-        query = query.eq('category', filters.category);
+      if (activeFilters?.category) {
+        query = query.eq('category', activeFilters.category);
       }
-      if (filters?.dateFrom) {
-        query = query.gte('date', filters.dateFrom);
+      if (activeFilters?.dateFrom) {
+        query = query.gte('date', activeFilters.dateFrom);
       }
-      if (filters?.dateTo) {
-        query = query.lte('date', filters.dateTo);
+      if (activeFilters?.dateTo) {
+        query = query.lte('date', activeFilters.dateTo);
       }
-      if (filters?.amountMin !== undefined) {
-        query = query.gte('amount', filters.amountMin);
+      if (activeFilters?.amountMin !== undefined) {
+        query = query.gte('amount', activeFilters.amountMin);
       }
-      if (filters?.amountMax !== undefined) {
-        query = query.lte('amount', filters.amountMax);
+      if (activeFilters?.amountMax !== undefined) {
+        query = query.lte('amount', activeFilters.amountMax);
       }
 
       const { data, error } = await query;

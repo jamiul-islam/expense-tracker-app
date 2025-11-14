@@ -76,22 +76,38 @@ export const FilterModal: React.FC<FilterModalProps> = ({
   const handleDateRangeChange = useCallback((rangeId: string) => {
     setDateRange(rangeId);
     const today = new Date();
+    today.setHours(23, 59, 59, 999); // End of today
     let from: Date | undefined;
-    const to: Date | undefined = today;
+    const to: Date = today;
 
     switch (rangeId) {
-      case 'today':
-        from = new Date(today.setHours(0, 0, 0, 0));
+      case 'today': {
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        from = startOfToday;
         break;
-      case 'week':
-        from = new Date(today.setDate(today.getDate() - 7));
+      }
+      case 'week': {
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        weekAgo.setHours(0, 0, 0, 0);
+        from = weekAgo;
         break;
-      case 'month':
-        from = new Date(today.setMonth(today.getMonth() - 1));
+      }
+      case 'month': {
+        const monthAgo = new Date();
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        monthAgo.setHours(0, 0, 0, 0);
+        from = monthAgo;
         break;
-      case 'last3months':
-        from = new Date(today.setMonth(today.getMonth() - 3));
+      }
+      case 'last3months': {
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+        threeMonthsAgo.setHours(0, 0, 0, 0);
+        from = threeMonthsAgo;
         break;
+      }
       case 'custom':
         // User will select custom dates
         return;
