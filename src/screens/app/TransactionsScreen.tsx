@@ -295,6 +295,14 @@ export const TransactionsScreen: React.FC = () => {
         visible={openModals.has('filterTransaction')}
         onClose={() => closeModal('filterTransaction')}
         onApply={handleApplyFilters}
+        initialFilters={{
+          type: filters.type || 'all',
+          category: filters.category || 'all',
+          dateFrom: filters.dateFrom,
+          dateTo: filters.dateTo,
+          amountMin: filters.amountMin,
+          amountMax: filters.amountMax,
+        }}
       />
 
       <TransactionDetailsModal
