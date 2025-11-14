@@ -37,13 +37,13 @@ export const TransactionsScreen: React.FC = () => {
     deleteTransaction,
     setSelectedTransaction,
     setFilters,
-    clearFilters,
+    clearFilters: _clearFilters,
   } = useTransactionStore();
 
   const { openModals, searchQuery, openModal, closeModal, setSearchQuery } = useUIStore();
   const { user } = useUserStore();
 
-  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [_isDeleting, setIsDeleting] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
 
   // Convert FilterOptions to TransactionFilters
