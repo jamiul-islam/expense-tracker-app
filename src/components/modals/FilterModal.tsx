@@ -276,42 +276,55 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                         },
                       ]}
                     />
-                    <View
-                      style={[
-                        styles.sliderThumb,
-                        {
-                          left: `${((amountMin - 150) / 350) * 100}%`,
-                        },
-                      ]}
-                    />
-                    <View
-                      style={[
-                        styles.sliderThumb,
-                        {
-                          left: `${((amountMax - 150) / 350) * 100}%`,
-                        },
-                      ]}
-                    />
                   </View>
-                  <View style={styles.hiddenSliders}>
-                    <Slider
-                      style={styles.hiddenSlider}
-                      minimumValue={150}
-                      maximumValue={500}
-                      value={amountMin}
-                      onValueChange={setAmountMin}
-                      minimumTrackTintColor="transparent"
-                      maximumTrackTintColor="transparent"
-                    />
-                    <Slider
-                      style={styles.hiddenSlider}
-                      minimumValue={150}
-                      maximumValue={500}
-                      value={amountMax}
-                      onValueChange={setAmountMax}
-                      minimumTrackTintColor="transparent"
-                      maximumTrackTintColor="transparent"
-                    />
+                  
+                  {/* Left thumb for min value */}
+                  <View
+                    style={[
+                      styles.sliderThumb,
+                      {
+                        left: `${((amountMin - 150) / 350) * 100}%`,
+                      },
+                    ]}
+                  />
+                  
+                  {/* Right thumb for max value */}
+                  <View
+                    style={[
+                      styles.sliderThumb,
+                      {
+                        left: `${((amountMax - 150) / 350) * 100}%`,
+                      },
+                    ]}
+                  />
+                  
+                  {/* Split slider areas */}
+                  <View style={styles.sliderAreas}>
+                    {/* Min slider - covers left portion */}
+                    <View style={[styles.sliderArea, { flex: (amountMin - 150) + 25 }]}>
+                      <Slider
+                        style={styles.areaSlider}
+                        minimumValue={150}
+                        maximumValue={amountMax - 10}
+                        value={amountMin}
+                        onValueChange={(value) => setAmountMin(Math.min(value, amountMax - 10))}
+                        minimumTrackTintColor="transparent"
+                        maximumTrackTintColor="transparent"
+                      />
+                    </View>
+                    
+                    {/* Max slider - covers right portion */}
+                    <View style={[styles.sliderArea, { flex: (500 - amountMax) + 25 }]}>
+                      <Slider
+                        style={styles.areaSlider}
+                        minimumValue={amountMin + 10}
+                        maximumValue={500}
+                        value={amountMax}
+                        onValueChange={(value) => setAmountMax(Math.max(value, amountMin + 10))}
+                        minimumTrackTintColor="transparent"
+                        maximumTrackTintColor="transparent"
+                      />
+                    </View>
                   </View>
                 </View>
                 <View style={styles.amountLabels}>
@@ -376,6 +389,12 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   applyButton: {
+    backgroundColor: colors.primary,
+    borderRadius: tokens.borderRadius.md,
+    flex: 1,
+    paddingVertical: spacing.md,
+  },
+  applyButton: {
     alignItems: 'center',
     backgroundColor: colors.primaryText,
     borderRadius: 58,
@@ -387,6 +406,10 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.semibold,
+  },
+  areaSlider: {
+    height: 40,
+    width: '100%',
   },
   categoryDropdown: {
     alignItems: 'center',
@@ -531,18 +554,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.lg,
   },
-  hiddenSlider: {
-    height: 40,
-    position: 'absolute',
-    width: '100%',
-  },
-  hiddenSliders: {
-    height: 40,
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
-  },
   lastSection: {
     marginBottom: spacing.md,
   },
@@ -602,6 +613,17 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.semibold,
     marginBottom: spacing.md,
     textTransform: 'uppercase',
+  },
+  sliderArea: {
+    height: 40,
+  },
+  sliderAreas: {
+    flexDirection: 'row',
+    height: 40,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
   sliderThumb: {
     backgroundColor: colors.primary,
