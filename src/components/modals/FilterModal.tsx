@@ -375,8 +375,9 @@ const styles = StyleSheet.create({
   },
   applyButtonText: {
     color: colors.white,
-    fontSize: typography.fontSize.sm,
+    fontSize: typography.fontSize.base,
     fontWeight: typography.fontWeight.semibold,
+    textAlign: 'center',
   },
   categoryDropdown: {
     alignItems: 'center',
