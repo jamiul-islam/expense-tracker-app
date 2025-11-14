@@ -5,7 +5,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import MultiSlider from 'react-native-multi-slider';
+import Slider from '@react-native-community/slider';
 import { colors, spacing, borderRadius, typography, shadows } from '@/theme';
 
 interface FilterModalProps {
@@ -265,33 +265,59 @@ export const FilterModal: React.FC<FilterModalProps> = ({
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Amount Range</Text>
               <View style={styles.amountContainer}>
-                <MultiSlider
-                  values={[amountMin, amountMax]}
-                  sliderLength={310}
-                  onValuesChange={values => {
-                    setAmountMin(values[0]);
-                    setAmountMax(values[1]);
-                  }}
-                  min={150}
-                  max={500}
-                  step={10}
-                  allowOverlap={false}
-                  snapped
-                  minMarkerOverlapDistance={20}
-                  customMarker={e => {
-                    return (
-                      <View style={styles.sliderMarker}>
-                        <View style={styles.sliderThumb} />
-                        <Text style={styles.sliderValue}>${e.currentValue}</Text>
-                      </View>
-                    );
-                  }}
-                  trackStyle={styles.sliderTrack}
-                  selectedStyle={styles.sliderSelected}
-                  unselectedStyle={styles.sliderUnselected}
-                  containerStyle={styles.sliderContainerStyle}
-                  markerContainerStyle={styles.markerContainer}
-                />
+                <View style={styles.rangeSliderContainer}>
+                  <View style={styles.sliderTrackBackground}>
+                    <View
+                      style={[
+                        styles.sliderTrackActive,
+                        {
+                          left: `${((amountMin - 150) / 350) * 100}%`,
+                          width: `${((amountMax - amountMin) / 350) * 100}%`,
+                        },
+                      ]}
+                    />
+                    <View
+                      style={[
+                        styles.sliderThumb,
+                        {
+                          left: `${((amountMin - 150) / 350) * 100}%`,
+                        },
+                      ]}
+                    />
+                    <View
+                      style={[
+                        styles.sliderThumb,
+                        {
+                          left: `${((amountMax - 150) / 350) * 100}%`,
+                        },
+                      ]}
+                    />
+                  </View>
+                  <View style={styles.hiddenSliders}>
+                    <Slider
+                      style={styles.hiddenSlider}
+                      minimumValue={150}
+                      maximumValue={500}
+                      value={amountMin}
+                      onValueChange={setAmountMin}
+                      minimumTrackTintColor="transparent"
+                      maximumTrackTintColor="transparent"
+                    />
+                    <Slider
+                      style={styles.hiddenSlider}
+                      minimumValue={150}
+                      maximumValue={500}
+                      value={amountMax}
+                      onValueChange={setAmountMax}
+                      minimumTrackTintColor="transparent"
+                      maximumTrackTintColor="transparent"
+                    />
+                  </View>
+                </View>
+                <View style={styles.amountLabels}>
+                  <Text style={styles.amountLabel}>${Math.round(amountMin)}</Text>
+                  <Text style={styles.amountLabel}>${Math.round(amountMax)}</Text>
+                </View>
               </View>
             </View>
 
@@ -338,6 +364,16 @@ const styles = StyleSheet.create({
   },
   amountContainer: {
     paddingTop: spacing.sm,
+  },
+  amountLabel: {
+    color: colors.primary,
+    fontSize: typography.fontSize.base,
+    fontWeight: '600',
+  },
+  amountLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: spacing.xs,
   },
   applyButton: {
     alignItems: 'center',
@@ -495,11 +531,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.lg,
   },
+  hiddenSlider: {
+    height: 40,
+    position: 'absolute',
+    width: '100%',
+  },
+  hiddenSliders: {
+    height: 40,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
   lastSection: {
     marginBottom: spacing.md,
-  },
-  markerContainer: {
-    marginTop: spacing.sm,
   },
   modalContainer: {
     backgroundColor: colors.white,
@@ -543,6 +588,11 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.regular,
   },
+  rangeSliderContainer: {
+    height: 40,
+    marginBottom: spacing.md,
+    position: 'relative',
+  },
   section: {
     marginBottom: spacing['2xl'],
   },
@@ -553,41 +603,31 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     textTransform: 'uppercase',
   },
-  sliderContainerStyle: {
-    alignSelf: 'center',
-    height: 60,
-    marginVertical: spacing.md,
-  },
-  sliderMarker: {
-    alignItems: 'center',
-    flexDirection: 'column',
-  },
-  sliderSelected: {
-    backgroundColor: colors.primary,
-    borderRadius: 4,
-    height: 8,
-  },
   sliderThumb: {
     backgroundColor: colors.primary,
-    borderRadius: 14,
-    height: 28,
-    width: 28,
+    borderRadius: 8,
+    height: 16,
+    marginLeft: -8,
+    position: 'absolute',
+    top: -6,
+    width: 16,
     ...shadows.sm,
   },
-  sliderTrack: {
-    borderRadius: 4,
-    height: 8,
+  sliderTrackActive: {
+    backgroundColor: colors.primary,
+    borderRadius: 2,
+    height: 4,
+    position: 'absolute',
+    top: 0,
   },
-  sliderUnselected: {
-    backgroundColor: 'rgba(12, 39, 65, 0.14)',
-    borderRadius: 4,
-    height: 8,
-  },
-  sliderValue: {
-    color: colors.text.percentage,
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.medium,
-    marginTop: spacing.xs,
+  sliderTrackBackground: {
+    backgroundColor: '#e5e7eb',
+    borderRadius: 2,
+    height: 4,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 18,
   },
   title: {
     color: colors.text.primary,
