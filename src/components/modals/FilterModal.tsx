@@ -5,6 +5,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import MultiSlider from 'react-native-multi-slider';
 import { colors, spacing, borderRadius, typography, shadows } from '@/theme';
 
 interface FilterModalProps {
@@ -264,22 +265,38 @@ export const FilterModal: React.FC<FilterModalProps> = ({
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Amount Range</Text>
               <View style={styles.amountContainer}>
-                <View style={styles.sliderContainer}>
-                  <View style={styles.sliderTrackBackground}>
-                    <View style={styles.sliderTrackActive} />
-                    <View style={[styles.sliderThumb, styles.sliderThumbMin]} />
-                    <View style={[styles.sliderThumb, styles.sliderThumbMax]} />
-                  </View>
-                </View>
-                <View style={styles.amountLabels}>
-                  <Text style={styles.amountLabel}>$150</Text>
-                  <Text style={styles.amountLabel}>$500</Text>
-                </View>
+                <MultiSlider
+                  values={[amountMin, amountMax]}
+                  sliderLength={310}
+                  onValuesChange={values => {
+                    setAmountMin(values[0]);
+                    setAmountMax(values[1]);
+                  }}
+                  min={150}
+                  max={500}
+                  step={10}
+                  allowOverlap={false}
+                  snapped
+                  minMarkerOverlapDistance={20}
+                  customMarker={e => {
+                    return (
+                      <View style={styles.sliderMarker}>
+                        <View style={styles.sliderThumb} />
+                        <Text style={styles.sliderValue}>${e.currentValue}</Text>
+                      </View>
+                    );
+                  }}
+                  trackStyle={styles.sliderTrack}
+                  selectedStyle={styles.sliderSelected}
+                  unselectedStyle={styles.sliderUnselected}
+                  containerStyle={styles.sliderContainerStyle}
+                  markerContainerStyle={styles.markerContainer}
+                />
               </View>
             </View>
 
             {/* Transaction Type */}
-            <View style={styles.section}>
+            <View style={[styles.section, styles.lastSection]}>
               <Text style={styles.sectionTitle}>Transaction Type</Text>
               <View style={styles.transactionTypeContainer}>
                 {(['all', 'income', 'expense'] as const).map(t => (
@@ -321,17 +338,6 @@ const styles = StyleSheet.create({
   },
   amountContainer: {
     paddingTop: spacing.sm,
-  },
-  amountLabel: {
-    color: colors.text.percentage,
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.medium,
-  },
-  amountLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: spacing.sm,
-    paddingHorizontal: spacing.md,
   },
   applyButton: {
     alignItems: 'center',
@@ -489,11 +495,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.lg,
   },
+  lastSection: {
+    marginBottom: spacing.md,
+  },
+  markerContainer: {
+    marginTop: spacing.sm,
+  },
   modalContainer: {
     backgroundColor: colors.white,
     borderTopLeftRadius: 26,
     borderTopRightRadius: 26,
-    height: '85%',
+    height: '60%',
     marginTop: 'auto',
     ...shadows.card,
   },
@@ -541,43 +553,41 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     textTransform: 'uppercase',
   },
-  sliderContainer: {
-    height: 40,
-    justifyContent: 'center',
+  sliderContainerStyle: {
+    alignSelf: 'center',
+    height: 60,
     marginVertical: spacing.md,
-    paddingHorizontal: 14,
-    position: 'relative',
+  },
+  sliderMarker: {
+    alignItems: 'center',
+    flexDirection: 'column',
+  },
+  sliderSelected: {
+    backgroundColor: colors.primary,
+    borderRadius: 4,
+    height: 8,
   },
   sliderThumb: {
     backgroundColor: colors.primary,
     borderRadius: 14,
     height: 28,
-    marginLeft: -14,
-    position: 'absolute',
-    top: -10,
     width: 28,
     ...shadows.sm,
   },
-  sliderThumbMax: {
-    left: 186,
-  },
-  sliderThumbMin: {
-    left: 52,
-  },
-  sliderTrackActive: {
-    backgroundColor: colors.primary,
+  sliderTrack: {
     borderRadius: 4,
     height: 8,
-    left: 48,
-    position: 'absolute',
-    width: 136,
   },
-  sliderTrackBackground: {
+  sliderUnselected: {
     backgroundColor: 'rgba(12, 39, 65, 0.14)',
-    borderRadius: 40,
+    borderRadius: 4,
     height: 8,
-    position: 'relative',
-    width: '100%',
+  },
+  sliderValue: {
+    color: colors.text.percentage,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.medium,
+    marginTop: spacing.xs,
   },
   title: {
     color: colors.text.primary,
