@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useUserStore } from '@/store';
 import { SplashScreen, EmailInputScreen, OTPVerificationScreen } from '@/screens/auth';
+import { ProfileScreen } from '@/screens/app';
 import { AppNavigator } from './AppNavigator';
 
 export type RootStackParamList = {
@@ -10,6 +11,7 @@ export type RootStackParamList = {
   App: undefined;
   EmailInput: undefined;
   OTPVerification: { email: string };
+  Profile: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -33,7 +35,16 @@ export function RootNavigator() {
         {isInitializing ? (
           <Stack.Screen name="Splash" component={SplashScreen} />
         ) : user ? (
-          <Stack.Screen name="App" component={AppNavigator} />
+          <>
+            <Stack.Screen name="App" component={AppNavigator} />
+            <Stack.Screen 
+              name="Profile" 
+              component={ProfileScreen}
+              options={{
+                presentation: 'card',
+              }}
+            />
+          </>
         ) : (
           <>
             <Stack.Screen name="EmailInput" component={EmailInputScreen} />
