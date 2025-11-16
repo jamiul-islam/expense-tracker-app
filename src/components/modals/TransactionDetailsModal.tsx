@@ -1,20 +1,19 @@
 /**
- * TransactionDetailsModal - Display transaction details
+ * TransactionDetailsModal - Display transaction details (Redesigned to match Figma)
  */
 
 import React from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, typography, shadows } from '@/theme';
-import { Button } from '@/components/common/Button';
+import { colors, spacing, borderRadius, typography } from '@/theme';
 import type { Transaction } from '@/types/database';
 
 interface TransactionDetailsModalProps {
   visible: boolean;
   transaction: Transaction | null;
   onClose: () => void;
-  onEdit: (transaction: Transaction) => void;
-  onDelete: (transaction: Transaction) => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
 const CATEGORY_ICONS: Record<string, string> = {
@@ -40,7 +39,7 @@ export const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = (
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
-      month: 'long',
+      month: 'short',
       day: 'numeric',
       year: 'numeric',
     });
@@ -55,85 +54,74 @@ export const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = (
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>Transaction Details</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <TouchableOpacity
+              onPress={onClose}
+              style={styles.closeButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
               <Ionicons name="close" size={24} color={colors.text.primary} />
             </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-            {/* Transaction Icon and Amount */}
-            <View style={styles.mainInfo}>
-              <View style={styles.iconContainer}>
-                <Ionicons
-                  name={iconName as keyof typeof Ionicons.glyphMap}
-                  size={32}
-                  color={colors.primary}
-                />
+            {/* Main Transaction Card */}
+            <View style={styles.mainCard}>
+              <View style={styles.mainCardContent}>
+                <View style={styles.iconContainer}>
+                  <Ionicons
+                    name={iconName as keyof typeof Ionicons.glyphMap}
+                    size={20}
+                    color={colors.primary}
+                  />
+                </View>
+                <View style={styles.mainInfoContent}>
+                  <Text style={styles.amount}>${transaction.amount.toFixed(2)}</Text>
+                  <Text style={styles.merchantName}>{transaction.title}</Text>
+                </View>
+                <Text style={styles.dateText}>{formatDate(transaction.date)}</Text>
               </View>
-              <Text style={[styles.amount, transaction.type === 'income' && styles.amountIncome]}>
-                {transaction.type === 'expense' ? '-' : '+'}${transaction.amount.toFixed(2)}
-              </Text>
-              <Text style={styles.category}>{transaction.category}</Text>
-              <Text style={styles.date}>{formatDate(transaction.date)}</Text>
             </View>
 
-            {/* Transaction Overview */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Transaction Overview</Text>
-              <View style={styles.overviewCard}>
-                <View style={styles.overviewRow}>
-                  <Text style={styles.overviewLabel}>Type</Text>
-                  <Text style={styles.overviewValue}>
-                    {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
-                  </Text>
-                </View>
-                <View style={styles.overviewRow}>
-                  <Text style={styles.overviewLabel}>Title</Text>
-                  <Text style={styles.overviewValue}>{transaction.title}</Text>
-                </View>
-                <View style={styles.overviewRow}>
-                  <Text style={styles.overviewLabel}>Category</Text>
-                  <Text style={styles.overviewValue}>{transaction.category}</Text>
-                </View>
-                <View style={styles.overviewRow}>
-                  <Text style={styles.overviewLabel}>Status</Text>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      styles[
-                        `status${transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}`
-                      ],
-                    ]}
-                  >
-                    <Text style={styles.statusText}>
-                      {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
-                    </Text>
-                  </View>
-                </View>
-                {transaction.note && (
-                  <View style={styles.overviewRow}>
-                    <Text style={styles.overviewLabel}>Note</Text>
-                    <Text style={styles.overviewValueNote}>{transaction.note}</Text>
-                  </View>
-                )}
+            {/* Transaction Overview Card */}
+            <View style={styles.overviewCard}>
+              <Text style={styles.overviewTitle}>Transaction Overview</Text>
+
+              {/* Transaction Type */}
+              <View style={styles.fieldContainer}>
+                <Text style={styles.fieldLabel}>Transaction type</Text>
+                <Text style={styles.fieldValue}>
+                  {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
+                </Text>
               </View>
+              <View style={styles.divider} />
+
+              {/* Category */}
+              <View style={styles.fieldContainer}>
+                <Text style={styles.fieldLabel}>Category</Text>
+                <Text style={styles.fieldValue}>{transaction.category}</Text>
+              </View>
+              <View style={styles.divider} />
+
+              {/* Note */}
+              {transaction.note && (
+                <>
+                  <View style={styles.fieldContainer}>
+                    <Text style={styles.fieldLabel}>Note</Text>
+                  </View>
+                  <Text style={styles.noteText}>{transaction.note}</Text>
+                </>
+              )}
             </View>
           </ScrollView>
 
-          {/* Actions */}
-          <View style={styles.actions}>
-            <Button
-              title="Delete"
-              variant="danger"
-              onPress={() => onDelete(transaction)}
-              style={styles.actionButton}
-            />
-            <Button
-              title="Edit"
-              variant="primary"
-              onPress={() => onEdit(transaction)}
-              style={styles.actionButton}
-            />
+          {/* Action Buttons */}
+          <View style={styles.actionsContainer}>
+            <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
+              <Text style={styles.deleteButtonText}>Delete</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.editButton} onPress={onEdit}>
+              <Text style={styles.editButtonText}>Edit Transaction</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -142,31 +130,17 @@ export const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = (
 };
 
 const styles = StyleSheet.create({
-  actionButton: {
-    flex: 1,
-  },
-  actions: {
-    borderTopColor: colors.border,
-    borderTopWidth: 1,
+  actionsContainer: {
     flexDirection: 'row',
     gap: spacing.md,
+    paddingBottom: spacing['2xl'],
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.lg,
+    paddingTop: spacing.lg,
   },
   amount: {
-    color: colors.danger,
-    fontSize: typography.fontSize['4xl'],
+    color: colors.primaryText,
+    fontSize: typography.fontSize['2xl'],
     fontWeight: typography.fontWeight.bold,
-    marginTop: spacing.md,
-  },
-  amountIncome: {
-    color: colors.success,
-  },
-  category: {
-    color: colors.text.secondary,
-    fontSize: typography.fontSize.base,
-    fontWeight: typography.fontWeight.medium,
-    marginTop: spacing.xs,
   },
   closeButton: {
     padding: spacing.xs,
@@ -174,98 +148,137 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
   },
-  date: {
-    color: colors.text.tertiary,
+  dateText: {
+    color: '#515771',
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.regular,
+    marginTop: spacing.xs,
+    textAlign: 'right',
+  },
+  deleteButton: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(231, 55, 55, 0.1)',
+    borderColor: '#FF2929',
+    borderRadius: 58,
+    borderWidth: 1,
+    height: 44,
+    justifyContent: 'center',
+    minWidth: 118,
+  },
+  deleteButtonText: {
+    color: '#DD1212',
     fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.semibold,
+  },
+  divider: {
+    backgroundColor: '#F0F0F0',
+    height: 1,
+    marginVertical: spacing.sm,
+  },
+  editButton: {
+    alignItems: 'center',
+    backgroundColor: colors.primaryText,
+    borderRadius: 58,
+    flex: 1,
+    height: 44,
+    justifyContent: 'center',
+  },
+  editButtonText: {
+    color: colors.white,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.semibold,
+  },
+  fieldContainer: {
+    marginBottom: spacing.xs,
+  },
+  fieldLabel: {
+    color: '#515771',
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.medium,
+  },
+  fieldValue: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.medium,
     marginTop: spacing.xs,
   },
   header: {
     alignItems: 'center',
-    borderBottomColor: colors.border,
-    borderBottomWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingBottom: spacing.md,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.lg,
+    paddingTop: spacing.lg,
   },
   iconContainer: {
     alignItems: 'center',
     backgroundColor: colors.background.iconCircle,
-    borderRadius: 50,
-    height: 80,
+    borderRadius: 17,
+    height: 34,
     justifyContent: 'center',
-    width: 80,
+    width: 34,
   },
-  mainInfo: {
-    alignItems: 'center',
-    paddingVertical: spacing['2xl'],
+  mainCard: {
+    backgroundColor: colors.white,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    borderRadius: 18,
+    borderWidth: 1,
+    marginBottom: spacing.lg,
+    padding: spacing.lg,
+  },
+  mainCardContent: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  mainInfoContent: {
+    flex: 1,
+  },
+  merchantName: {
+    color: '#515771',
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.medium,
+    marginTop: spacing.xs,
   },
   modalContainer: {
     backgroundColor: colors.white,
-    borderTopLeftRadius: borderRadius.lg,
-    borderTopRightRadius: borderRadius.lg,
-    height: '75%',
+    borderTopLeftRadius: 26,
+    borderTopRightRadius: 26,
+    height: '64%',
     marginTop: 'auto',
-    ...shadows.card,
+  },
+  noteText: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.medium,
+    lineHeight: 20,
+    marginTop: spacing.xs,
   },
   overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(9, 36, 73, 0.21)',
     flex: 1,
     justifyContent: 'flex-end',
   },
   overviewCard: {
     backgroundColor: colors.white,
-    borderColor: colors.border,
-    borderRadius: borderRadius.md,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    borderRadius: borderRadius.lg,
     borderWidth: 1,
+    marginBottom: spacing.lg,
     padding: spacing.lg,
   },
-  overviewLabel: {
-    color: colors.text.secondary,
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.medium,
-  },
-  overviewRow: {
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.sm,
-  },
-  overviewValue: {
-    color: colors.text.primary,
+  overviewTitle: {
+    color: '#3C404B',
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.semibold,
-  },
-  overviewValueNote: {
-    color: colors.text.secondary,
-    flex: 1,
-    fontSize: typography.fontSize.sm,
-    marginLeft: spacing.md,
-    textAlign: 'right',
-  },
-  section: {
-    marginBottom: spacing['2xl'],
-  },
-  sectionTitle: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.base,
-    fontWeight: typography.fontWeight.semibold,
-    marginBottom: spacing.md,
-  },
-  statusBadge: {
-    borderRadius: borderRadius.pill,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-  },
-  statusText: {
-    fontSize: typography.fontSize.xs,
-    fontWeight: typography.fontWeight.medium,
+    marginBottom: spacing.lg,
   },
   title: {
     color: colors.text.primary,
-    fontSize: typography.fontSize.xl,
-    fontWeight: typography.fontWeight.semibold,
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.bold,
   },
 });
 

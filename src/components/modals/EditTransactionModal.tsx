@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopLeftRadius: 26,
     borderTopRightRadius: 26,
-    height: '70%',
+    height: '80%',
     marginTop: 'auto',
     ...shadows.card,
   },

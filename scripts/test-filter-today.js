@@ -21,7 +21,7 @@ async function testTodayFilter() {
   // Get today's date in YYYY-MM-DD format
   const today = new Date();
   const todayStr = today.toISOString().split('T')[0];
-  
+
   console.log('Today:', todayStr);
 
   // Test 1: Get all transactions for today

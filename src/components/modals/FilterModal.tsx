@@ -19,7 +19,7 @@ export interface FilterOptions {
   type?: 'all' | 'income' | 'expense';
   category?: string;
   dateFrom?: string; // Changed to string for consistency
-  dateTo?: string;   // Changed to string for consistency
+  dateTo?: string; // Changed to string for consistency
   amountMin?: number;
   amountMax?: number;
 }
@@ -288,7 +288,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                 <View style={styles.rangeSliderContainer}>
                   {/* Background track */}
                   <View style={styles.sliderTrackBackground} />
-                  
+
                   {/* Active track - positioned absolutely */}
                   <View
                     style={[
@@ -299,25 +299,25 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                       },
                     ]}
                   />
-                  
+
                   {/* Min value slider */}
                   <Slider
                     style={styles.minSlider}
                     minimumValue={150}
                     maximumValue={amountMax - 10}
                     value={amountMin}
-                    onValueChange={(value) => setAmountMin(Math.min(value, amountMax - 10))}
+                    onValueChange={value => setAmountMin(Math.min(value, amountMax - 10))}
                     minimumTrackTintColor="transparent"
                     maximumTrackTintColor="transparent"
                   />
-                  
+
                   {/* Max value slider */}
                   <Slider
                     style={styles.maxSlider}
                     minimumValue={amountMin + 10}
                     maximumValue={500}
                     value={amountMax}
-                    onValueChange={(value) => setAmountMax(Math.max(value, amountMin + 10))}
+                    onValueChange={value => setAmountMax(Math.max(value, amountMin + 10))}
                     minimumTrackTintColor="transparent"
                     maximumTrackTintColor="transparent"
                   />

@@ -59,10 +59,13 @@ export const TransactionsScreen: React.FC = () => {
   }, []);
 
   // Handle filter application
-  const handleApplyFilters = useCallback((filterOptions: FilterOptions) => {
-    const transactionFilters = convertFilterOptions(filterOptions);
-    setFilters(transactionFilters);
-  }, [convertFilterOptions, setFilters]);
+  const handleApplyFilters = useCallback(
+    (filterOptions: FilterOptions) => {
+      const transactionFilters = convertFilterOptions(filterOptions);
+      setFilters(transactionFilters);
+    },
+    [convertFilterOptions, setFilters]
+  );
 
   // Fetch transactions on mount
   useEffect(() => {
@@ -113,11 +116,11 @@ export const TransactionsScreen: React.FC = () => {
   const hasActiveFilters = useMemo(() => {
     return Boolean(
       filters.type ||
-      filters.category ||
-      filters.dateFrom ||
-      filters.dateTo ||
-      (filters.amountMin !== undefined && filters.amountMin > 0) ||
-      (filters.amountMax !== undefined && filters.amountMax < 10000)
+        filters.category ||
+        filters.dateFrom ||
+        filters.dateTo ||
+        (filters.amountMin !== undefined && filters.amountMin > 0) ||
+        (filters.amountMax !== undefined && filters.amountMax < 10000)
     );
   }, [filters]);
 
