@@ -35,11 +35,6 @@ export default function DashboardScreen() {
     setRefreshing(false);
   };
 
-  const handleAvatarPress = () => {
-    // TODO: Navigate to Profile screen or open profile modal
-    console.log('Avatar pressed - open profile');
-  };
-
   const handleNotificationPress = () => {
     // TODO: Open notifications
     console.log('Notification pressed');
@@ -151,7 +146,6 @@ export default function DashboardScreen() {
               userName={user?.full_name || 'User'}
               avatarUrl={user?.avatar_url}
               hasNotification={false}
-              onAvatarPress={handleAvatarPress}
               onNotificationPress={handleNotificationPress}
             />
 
