@@ -295,29 +295,38 @@ export default function AnalyticsScreen() {
 
   if (isLoading && !refreshing) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={styles.container}>
         <LinearGradient
           colors={[colors.background.gradientStart, colors.background.gradientEnd]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0.3, y: 1 }}
           style={styles.gradient}
         >
-          <ScreenHeader
-            title="Analytics"
-            onAvatarPress={handleAvatarPress}
-            onNotificationPress={handleNotificationPress}
-            showBackButton={false}
-          />
-          <LoadingSpinner />
+          <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+            <ScreenHeader
+              userName="Analytics"
+              avatarUrl={user?.avatar_url}
+              hasNotification={false}
+              onAvatarPress={handleAvatarPress}
+              onNotificationPress={handleNotificationPress}
+              hideGreeting
+            />
+            <LoadingSpinner />
+          </SafeAreaView>
         </LinearGradient>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <View style={styles.container}>
       <LinearGradient
         colors={[colors.background.gradientStart, colors.background.gradientEnd]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.3, y: 1 }}
         style={styles.gradient}
       >
+        <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <ScreenHeader
         userName="Analytics"
         avatarUrl={user?.avatar_url}
@@ -423,8 +432,9 @@ export default function AnalyticsScreen() {
             {renderCategoryDonutChart()}
           </View>
         </ScrollView>
+        </SafeAreaView>
       </LinearGradient>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -501,6 +511,9 @@ const styles = StyleSheet.create({
   },
   chartWrapper: {
     marginTop: spacing.md,
+  },
+  container: {
+    flex: 1,
   },
   contentContainer: {
     paddingBottom: spacing['3xl'],
