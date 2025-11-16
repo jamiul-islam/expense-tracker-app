@@ -5,9 +5,17 @@
 
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { colors, spacing, typography, borderRadius } from '@/theme';
 import { Text } from '../common/Text';
 import { Icon } from '../common/Icon';
+
+type RootStackParamList = {
+  Profile: undefined;
+};
+
+type NavigationProp = StackNavigationProp<RootStackParamList, 'Profile'>;
 
 interface ScreenHeaderProps {
   greeting?: string;
@@ -28,6 +36,16 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
   onAvatarPress,
   hideGreeting = false,
 }) => {
+  const navigation = useNavigation<NavigationProp>();
+
+  const handleAvatarPress = () => {
+    if (onAvatarPress) {
+      onAvatarPress();
+    } else {
+      navigation.navigate('Profile');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.leftSection}>
@@ -43,7 +61,7 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
         </TouchableOpacity>
 
         {/* Profile Avatar */}
-        <TouchableOpacity style={styles.avatarButton} onPress={onAvatarPress}>
+        <TouchableOpacity style={styles.avatarButton} onPress={handleAvatarPress}>
           {avatarUrl ? (
             <Image source={{ uri: avatarUrl }} style={styles.avatar} />
           ) : (
