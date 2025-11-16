@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopLeftRadius: 26,
     borderTopRightRadius: 26,
-    height: '64%',
+    height: '60%',
     marginTop: 'auto',
   },
   noteText: {

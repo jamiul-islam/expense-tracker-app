@@ -1,12 +1,11 @@
 /**
- * DeleteConfirmationModal - Confirm transaction deletion
+ * DeleteConfirmationModal - Confirm transaction deletion (Redesigned to match Figma)
  */
 
 import React from 'react';
-import { View, Text, Modal, StyleSheet } from 'react-native';
+import { View, Text, Modal, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, typography, shadows } from '@/theme';
-import { Button } from '@/components/common/Button';
+import { colors, spacing, typography } from '@/theme';
 
 interface DeleteConfirmationModalProps {
   visible: boolean;
@@ -25,33 +24,37 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          {/* Icon */}
+          {/* Delete Icon */}
           <View style={styles.iconContainer}>
-            <Ionicons name="warning" size={48} color={colors.danger} />
+            <Ionicons name="trash-outline" size={28} color="#E02C2F" />
           </View>
 
           {/* Content */}
-          <Text style={styles.title}>Delete Transaction?</Text>
-          <Text style={styles.message}>
-            Are you sure you want to delete this transaction? This action cannot be undone.
-          </Text>
+          <View style={styles.contentContainer}>
+            <Text style={styles.title}>Delete Transaction</Text>
+            <Text style={styles.message}>
+              Are you sure you want to delete your transaction? This action is permanent and will
+              remove all your data from Tranzo. You can&apos;t undo this.
+            </Text>
 
-          {/* Actions */}
-          <View style={styles.actions}>
-            <Button
-              title="Cancel"
-              variant="secondary"
-              onPress={onClose}
-              style={styles.actionButton}
-              disabled={loading}
-            />
-            <Button
-              title="Yes, Delete"
-              variant="danger"
+            {/* Delete Button */}
+            <TouchableOpacity
+              style={[styles.deleteButton, loading && styles.deleteButtonDisabled]}
               onPress={onConfirm}
-              style={styles.actionButton}
-              loading={loading}
-            />
+              disabled={loading}
+            >
+              <Text style={styles.deleteButtonText}>Yes, Delete</Text>
+            </TouchableOpacity>
+
+            {/* Cancel Button */}
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={onClose}
+              disabled={loading}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -60,42 +63,64 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
 };
 
 const styles = StyleSheet.create({
-  actionButton: {
-    flex: 1,
+  cancelButton: {
+    alignItems: 'center',
+    paddingVertical: spacing.md,
   },
-  actions: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginTop: spacing['2xl'],
+  cancelButtonText: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.medium,
+  },
+  contentContainer: {
+    alignItems: 'center',
+    gap: spacing['2xl'],
+  },
+  deleteButton: {
+    alignItems: 'center',
+    backgroundColor: '#E02C2F',
+    borderRadius: 60,
+    height: 50,
+    justifyContent: 'center',
+    width: '100%',
+  },
+  deleteButtonDisabled: {
+    opacity: 0.6,
+  },
+  deleteButtonText: {
+    color: colors.white,
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.medium,
   },
   iconContainer: {
     alignItems: 'center',
     marginBottom: spacing.lg,
   },
   message: {
-    color: colors.text.secondary,
+    color: '#434A52',
     fontSize: typography.fontSize.sm,
-    lineHeight: 20,
-    marginTop: spacing.sm,
+    lineHeight: 22,
     textAlign: 'center',
   },
   modalContainer: {
     backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    marginHorizontal: spacing['2xl'],
-    padding: spacing['2xl'],
-    ...shadows.card,
+    borderRadius: 18,
+    marginHorizontal: spacing.lg,
+    paddingBottom: spacing['2xl'],
+    paddingHorizontal: spacing.lg,
+    paddingTop: 40,
+    width: 358,
   },
   overlay: {
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(9, 36, 73, 0.21)',
     flex: 1,
     justifyContent: 'center',
   },
   title: {
-    color: colors.text.primary,
+    color: '#091C35',
     fontSize: typography.fontSize.xl,
-    fontWeight: typography.fontWeight.semibold,
+    fontWeight: typography.fontWeight.medium,
     textAlign: 'center',
   },
 });
