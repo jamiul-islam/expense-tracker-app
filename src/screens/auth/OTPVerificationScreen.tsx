@@ -7,16 +7,23 @@ import {
   TextInput,
   ActivityIndicator,
   Alert,
+  NativeSyntheticEvent,
+  TextInputKeyPressEventData,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '@/theme';
 import { authService } from '@/services/authService';
 import { useUserStore } from '@/store';
 
-type Props = NativeStackScreenProps<any, 'OTPVerification'>;
+type AuthStackParamList = {
+  EmailInput: undefined;
+  OTPVerification: { email: string };
+};
+
+type Props = NativeStackScreenProps<AuthStackParamList, 'OTPVerification'>;
 
 export function OTPVerificationScreen({ navigation, route }: Props) {
-  const { email } = route.params as { email: string };
+  const { email } = route.params;
   const setUser = useUserStore(state => state.setUser);
 
   const [otp, setOtp] = useState(['', '', '', '', '', '', '', '']);
@@ -71,7 +78,7 @@ export function OTPVerificationScreen({ navigation, route }: Props) {
     }
   };
 
-  const handleKeyPress = (e: any, index: number) => {
+  const handleKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>, index: number) => {
     if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
@@ -98,7 +105,7 @@ export function OTPVerificationScreen({ navigation, route }: Props) {
       } else {
         setError(response.error || 'Invalid verification code');
       }
-    } catch (err) {
+    } catch {
       setError('Verification failed. Please try again');
     } finally {
       setIsVerifying(false);
@@ -119,7 +126,7 @@ export function OTPVerificationScreen({ navigation, route }: Props) {
       } else {
         setError(response.error || 'Failed to resend code');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to resend code');
     } finally {
       setIsResending(false);
@@ -146,7 +153,9 @@ export function OTPVerificationScreen({ navigation, route }: Props) {
           {otp.map((digit, index) => (
             <TextInput
               key={index}
-              ref={ref => (inputRefs.current[index] = ref)}
+              ref={ref => {
+                inputRefs.current[index] = ref;
+              }}
               style={[
                 styles.otpInput,
                 digit && styles.otpInputFilled,
@@ -239,7 +248,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   errorText: {
-    color: colors.error,
+    color: colors.danger,
     fontSize: 14,
     marginBottom: 16,
     textAlign: 'center',
@@ -267,7 +276,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   otpInput: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.background.primary,
     borderColor: colors.border,
     borderRadius: 12,
     borderWidth: 2,
@@ -279,7 +288,7 @@ const styles = StyleSheet.create({
     width: 42,
   },
   otpInputError: {
-    borderColor: colors.error,
+    borderColor: colors.danger,
   },
   otpInputFilled: {
     borderColor: colors.secondary,

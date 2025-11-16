@@ -13,7 +13,12 @@ import { TextInput } from '@/components';
 import { colors } from '@/theme';
 import { authService } from '@/services/authService';
 
-type Props = NativeStackScreenProps<any, 'EmailInput'>;
+type AuthStackParamList = {
+  EmailInput: undefined;
+  OTPVerification: { email: string };
+};
+
+type Props = NativeStackScreenProps<AuthStackParamList, 'EmailInput'>;
 
 export function EmailInputScreen({ navigation }: Props) {
   const [email, setEmail] = useState('');
@@ -49,7 +54,7 @@ export function EmailInputScreen({ navigation }: Props) {
       } else {
         setError(response.error || 'Failed to send verification code');
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setIsLoading(false);

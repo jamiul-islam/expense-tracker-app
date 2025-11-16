@@ -53,7 +53,7 @@ class Storage {
   /**
    * Save an object as JSON
    */
-  async setObject(key: string, value: any): Promise<void> {
+  async setObject<T>(key: string, value: T): Promise<void> {
     try {
       const jsonValue = JSON.stringify(value);
       await AsyncStorage.setItem(key, jsonValue);

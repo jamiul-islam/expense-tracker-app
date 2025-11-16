@@ -1,0 +1,422 @@
+/**
+ * AddTransactionModal - Add new transaction
+ */
+
+import React, { useState, useCallback } from 'react';
+import {
+  View,
+  Text,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  TextInput as RNTextInput,
+  Platform,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { colors, spacing, borderRadius, typography, shadows } from '@/theme';
+import { CategorySelector } from '@/components/common/CategorySelector';
+import type { Database } from '@/types/database';
+
+interface AddTransactionModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onAdd: (transaction: Database['public']['Tables']['transactions']['Insert']) => void;
+  userId: string;
+}
+
+const CATEGORIES = [
+  { id: 'Grocery', name: 'Grocery', icon: 'cart' },
+  { id: 'Transport', name: 'Transport', icon: 'car' },
+  { id: 'Entertainment', name: 'Entertainment', icon: 'musical-notes' },
+  { id: 'Medicine', name: 'Medicine', icon: 'medkit' },
+  { id: 'Education', name: 'Education', icon: 'school' },
+  { id: 'Shopping', name: 'Shopping', icon: 'bag-handle' },
+  { id: 'Income', name: 'Income', icon: 'cash' },
+];
+
+export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
+  visible,
+  onClose,
+  onAdd,
+  userId,
+}) => {
+  const [type, setType] = useState<'income' | 'expense'>('expense');
+  const [amount, setAmount] = useState('');
+  const [category, setCategory] = useState('Grocery');
+  const [note, setNote] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validate = useCallback(() => {
+    const newErrors: Record<string, string> = {};
+
+    if (!amount || parseFloat(amount) <= 0) {
+      newErrors.amount = 'Amount must be greater than 0';
+    }
+
+    if (!category) {
+      newErrors.category = 'Category is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [amount, category]);
+
+  const handleSubmit = useCallback(() => {
+    if (!validate()) return;
+
+    const transaction: Database['public']['Tables']['transactions']['Insert'] = {
+      user_id: userId,
+      type,
+      amount: parseFloat(amount),
+      category,
+      title: category, // Use category as title
+      note: note.trim() || null,
+      date,
+      status: 'completed',
+    };
+
+    onAdd(transaction);
+
+    // Reset form
+    setAmount('');
+    setNote('');
+    setType('expense');
+    setCategory('Grocery');
+    setErrors({});
+    onClose();
+  }, [validate, userId, type, amount, category, note, date, onAdd, onClose]);
+
+  const handleClose = useCallback(() => {
+    setAmount('');
+    setNote('');
+    setType('expense');
+    setCategory('Grocery');
+    setDate(new Date().toISOString().split('T')[0]);
+    setShowDatePicker(false);
+    setErrors({});
+    onClose();
+  }, [onClose]);
+
+  const handleDateChange = useCallback((event: { type: string }, selectedDate?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+    if (selectedDate) {
+      setDate(selectedDate.toISOString().split('T')[0]);
+    }
+  }, []);
+
+  const formatDateDisplay = useCallback((dateString: string) => {
+    const dateObj = new Date(dateString);
+    return dateObj.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }, []);
+
+  return (
+    <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
+      <View style={styles.overlay}>
+        <View style={styles.modalContainer}>
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.title}>Add New Transaction</Text>
+            <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+              <Ionicons name="close" size={24} color={colors.text.primary} />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+            {/* Transaction Type */}
+            <View style={styles.section}>
+              <View style={styles.transactionTypeContainer}>
+                <TouchableOpacity
+                  style={[
+                    styles.transactionTypeButton,
+                    type === 'expense' && styles.transactionTypeButtonActive,
+                  ]}
+                  onPress={() => setType('expense')}
+                >
+                  <Text
+                    style={[
+                      styles.transactionTypeText,
+                      type === 'expense' && styles.transactionTypeTextActive,
+                    ]}
+                  >
+                    Expense
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.transactionTypeButton,
+                    type === 'income' && styles.transactionTypeButtonActive,
+                  ]}
+                  onPress={() => setType('income')}
+                >
+                  <Text
+                    style={[
+                      styles.transactionTypeText,
+                      type === 'income' && styles.transactionTypeTextActive,
+                    ]}
+                  >
+                    Income
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Amount */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Amount</Text>
+              <View style={styles.amountContainer}>
+                <Text style={styles.currencySymbol}>$</Text>
+                <RNTextInput
+                  style={styles.amountInput}
+                  value={amount}
+                  onChangeText={setAmount}
+                  placeholder="540.00"
+                  placeholderTextColor={colors.text.tertiary}
+                  keyboardType="decimal-pad"
+                />
+              </View>
+              {errors.amount && <Text style={styles.errorText}>{errors.amount}</Text>}
+            </View>
+
+            {/* Category */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Category</Text>
+              <CategorySelector
+                categories={CATEGORIES}
+                selectedCategory={category}
+                onSelect={setCategory}
+                placeholder="Choose category"
+              />
+              {errors.category && <Text style={styles.errorText}>{errors.category}</Text>}
+            </View>
+
+            {/* Date */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Date</Text>
+              <TouchableOpacity
+                style={styles.datePickerButton}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Text style={styles.datePickerValue}>{formatDateDisplay(date)}</Text>
+                <Ionicons name="calendar-outline" size={20} color={colors.text.tertiary} />
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={new Date(date)}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={handleDateChange}
+                  maximumDate={new Date()}
+                />
+              )}
+            </View>
+
+            {/* Note */}
+            <View style={[styles.section, styles.lastSection]}>
+              <Text style={styles.sectionTitle}>Note</Text>
+              <RNTextInput
+                style={styles.noteInput}
+                value={note}
+                onChangeText={setNote}
+                placeholder="Write a note here"
+                placeholderTextColor={colors.text.tertiary}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+              />
+            </View>
+          </ScrollView>
+
+          {/* Actions */}
+          <View style={styles.actions}>
+            <TouchableOpacity style={styles.cancelButton} onPress={handleClose}>
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.saveButton} onPress={handleSubmit}>
+              <Text style={styles.saveButtonText}>Save</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+const styles = StyleSheet.create({
+  actions: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+  },
+  amountContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: spacing.md,
+  },
+  amountInput: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize['4xl'],
+    fontWeight: typography.fontWeight.semibold,
+    includeFontPadding: false,
+    padding: 0,
+    textAlign: 'center',
+  },
+  cancelButton: {
+    alignItems: 'center',
+    borderColor: colors.primaryText,
+    borderRadius: 58,
+    borderWidth: 1,
+    flex: 1,
+    height: 44,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+  },
+  cancelButtonText: {
+    color: colors.primaryText,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.semibold,
+  },
+  closeButton: {
+    padding: spacing.xs,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: spacing.lg,
+  },
+  currencySymbol: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize['4xl'],
+    fontWeight: typography.fontWeight.semibold,
+    includeFontPadding: false,
+    marginRight: spacing.xs,
+  },
+  datePickerButton: {
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    borderColor: colors.border,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    flexDirection: 'row',
+    height: 48,
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.md,
+  },
+  datePickerValue: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.regular,
+  },
+  errorText: {
+    color: colors.danger,
+    fontSize: typography.fontSize.xs,
+    marginTop: spacing.xs,
+  },
+  header: {
+    alignItems: 'center',
+    borderBottomColor: colors.border,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+  },
+  lastSection: {
+    marginBottom: spacing.md,
+  },
+  modalContainer: {
+    backgroundColor: colors.white,
+    borderTopLeftRadius: 26,
+    borderTopRightRadius: 26,
+    height: '80%',
+    marginTop: 'auto',
+    ...shadows.card,
+  },
+  noteInput: {
+    backgroundColor: colors.white,
+    borderColor: colors.border,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    color: colors.text.primary,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.regular,
+    height: 92,
+    padding: spacing.md,
+    textAlignVertical: 'top',
+  },
+  overlay: {
+    backgroundColor: 'rgba(9, 36, 73, 0.21)',
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  saveButton: {
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    borderRadius: 58,
+    flex: 1,
+    height: 44,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+  },
+  saveButtonText: {
+    color: colors.white,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.semibold,
+  },
+  section: {
+    marginBottom: spacing['2xl'],
+  },
+  sectionTitle: {
+    color: colors.text.secondary,
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.semibold,
+    marginBottom: spacing.md,
+    marginTop: spacing.sm,
+    textTransform: 'uppercase',
+  },
+  title: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.bold,
+  },
+  transactionTypeButton: {
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    borderColor: 'rgba(0,0,0,0.1)',
+    borderRadius: borderRadius.pill,
+    borderWidth: 1,
+    flex: 1,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  transactionTypeButtonActive: {
+    backgroundColor: colors.background.activeTab,
+    borderColor: colors.primary,
+  },
+  transactionTypeContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  transactionTypeText: {
+    color: colors.primaryText,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.regular,
+  },
+  transactionTypeTextActive: {
+    color: colors.primary,
+    fontWeight: typography.fontWeight.semibold,
+  },
+});
+
+export default AddTransactionModal;

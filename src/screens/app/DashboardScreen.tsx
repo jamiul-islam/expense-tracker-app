@@ -59,7 +59,7 @@ export default function DashboardScreen() {
   // Calculate top spending categories from actual transaction data
   const calculateTopSpending = () => {
     const categoryTotals: { [key: string]: number } = {};
-    
+
     transactions
       .filter(t => t.type === 'expense')
       .forEach(t => {
@@ -72,7 +72,7 @@ export default function DashboardScreen() {
     }));
 
     categoryArray.sort((a, b) => b.amount - a.amount);
-    
+
     const top3 = categoryArray.slice(0, 3);
     const totalOfTop3 = top3.reduce((sum, item) => sum + item.amount, 0);
 
@@ -155,61 +155,64 @@ export default function DashboardScreen() {
               onNotificationPress={handleNotificationPress}
             />
 
-        {/* Balance Card */}
-        <BalanceCard totalBalance={totalBalance} income={totalIncome} expense={totalExpense} />
+            {/* Balance Card */}
+            <BalanceCard totalBalance={totalBalance} income={totalIncome} expense={totalExpense} />
 
-        {/* Top Spending Overview */}
-        <DonutChart data={topSpendingData} totalSpent={totalSpent} />
+            {/* Top Spending Overview */}
+            <DonutChart data={topSpendingData} totalSpent={totalSpent} />
 
-        {/* Recent Transactions */}
-        <Card style={styles.recentCard}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Recent Transactions</Text>
-          </View>
+            {/* Recent Transactions */}
+            <Card style={styles.recentCard}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Recent Transactions</Text>
+              </View>
 
-          {recentTransactionSections.length > 0 ? (
-            <View style={styles.transactionsContent}>
-              {recentTransactionSections.map((section, sectionIndex) => (
-                <View key={sectionIndex} style={styles.dateGroup}>
-                  {/* Date Header */}
-                  <View style={styles.dateHeader}>
-                    <Text style={styles.dateText}>{section.title}</Text>
-                    <Text style={styles.dateTotalText}>
-                      {formatCurrency(
-                        section.data.reduce((sum, t) => sum + (t.type === 'expense' ? -t.amount : t.amount), 0)
-                      )}
-                    </Text>
-                  </View>
+              {recentTransactionSections.length > 0 ? (
+                <View style={styles.transactionsContent}>
+                  {recentTransactionSections.map((section, sectionIndex) => (
+                    <View key={sectionIndex} style={styles.dateGroup}>
+                      {/* Date Header */}
+                      <View style={styles.dateHeader}>
+                        <Text style={styles.dateText}>{section.title}</Text>
+                        <Text style={styles.dateTotalText}>
+                          {formatCurrency(
+                            section.data.reduce(
+                              (sum, t) => sum + (t.type === 'expense' ? -t.amount : t.amount),
+                              0
+                            )
+                          )}
+                        </Text>
+                      </View>
 
-                  {/* Transactions for this date */}
-                  {section.data.map((transaction, index) => (
-                    <React.Fragment key={transaction.id}>
-                      <TransactionItem transaction={transaction} onPress={() => {}} />
-                      {index < section.data.length - 1 && <View style={styles.divider} />}
-                    </React.Fragment>
+                      {/* Transactions for this date */}
+                      {section.data.map((transaction, index) => (
+                        <React.Fragment key={transaction.id}>
+                          <TransactionItem transaction={transaction} onPress={() => {}} />
+                          {index < section.data.length - 1 && <View style={styles.divider} />}
+                        </React.Fragment>
+                      ))}
+                    </View>
                   ))}
-                </View>
-              ))}
 
-              {/* See More Button */}
-              <TouchableOpacity style={styles.seeMoreButton} onPress={() => {}}>
-                <Text style={styles.seeMoreText}>See more transactions</Text>
-                <View style={styles.arrowIcon}>
-                  <Text style={styles.arrowText}>›</Text>
+                  {/* See More Button */}
+                  <TouchableOpacity style={styles.seeMoreButton} onPress={() => {}}>
+                    <Text style={styles.seeMoreText}>See more transactions</Text>
+                    <View style={styles.arrowIcon}>
+                      <Text style={styles.arrowText}>›</Text>
+                    </View>
+                  </TouchableOpacity>
                 </View>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>No recent transactions</Text>
-              <Text style={styles.emptySubtext}>
-                Your transactions will appear here once you add them
-              </Text>
-            </View>
-          )}
-        </Card>
-      </ScrollView>
-      </SafeAreaView>
+              ) : (
+                <View style={styles.emptyState}>
+                  <Text style={styles.emptyText}>No recent transactions</Text>
+                  <Text style={styles.emptySubtext}>
+                    Your transactions will appear here once you add them
+                  </Text>
+                </View>
+              )}
+            </Card>
+          </ScrollView>
+        </SafeAreaView>
       </LinearGradient>
     </View>
   );

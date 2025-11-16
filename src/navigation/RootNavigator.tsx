@@ -5,7 +5,14 @@ import { useUserStore } from '@/store';
 import { SplashScreen, EmailInputScreen, OTPVerificationScreen } from '@/screens/auth';
 import { AppNavigator } from './AppNavigator';
 
-const Stack = createStackNavigator();
+export type RootStackParamList = {
+  Splash: undefined;
+  App: undefined;
+  EmailInput: undefined;
+  OTPVerification: { email: string };
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
   const [isInitializing, setIsInitializing] = useState(true);
