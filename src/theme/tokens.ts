@@ -19,6 +19,7 @@ export const borderRadius = {
   none: 0,
   sm: 8,
   md: 10, // Summary boxes (Figma)
+  card: 12, // Analytics cards (Figma)
   lg: 20, // Cards (Figma)
   pill: 40, // Active tab (Figma)
   full: 999,
@@ -75,6 +76,14 @@ export const shadows = {
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.07,
     shadowRadius: 6,
+    elevation: 4,
+  },
+  analyticsCard: {
+    // Figma Analytics: 0px 4px 20px rgba(23,37,81,0.06)
+    shadowColor: '#172551',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 20,
     elevation: 4,
   },
   summaryBox: {
