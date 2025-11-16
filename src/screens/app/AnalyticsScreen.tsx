@@ -52,10 +52,6 @@ export default function AnalyticsScreen() {
     setRefreshing(false);
   };
 
-  const handleAvatarPress = () => {
-    console.log('Avatar pressed - open profile');
-  };
-
   const handleNotificationPress = () => {
     console.log('Notification pressed');
   };
@@ -307,7 +303,6 @@ export default function AnalyticsScreen() {
               userName="Analytics"
               avatarUrl={user?.avatar_url}
               hasNotification={false}
-              onAvatarPress={handleAvatarPress}
               onNotificationPress={handleNotificationPress}
               hideGreeting
             />
@@ -331,7 +326,6 @@ export default function AnalyticsScreen() {
         userName="Analytics"
         avatarUrl={user?.avatar_url}
         hasNotification={false}
-        onAvatarPress={handleAvatarPress}
         onNotificationPress={handleNotificationPress}
         hideGreeting
       />
