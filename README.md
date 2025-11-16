@@ -26,6 +26,25 @@ The app follows a pixel-perfect design system inspired by modern fintech applica
 
 ---
 
+## 📱 APP UI
+
+<table>
+  <tr>
+    <td><img src="./assets/1-ss.png" alt="Screenshot 1" width="150"/></td>
+    <td><img src="./assets/2-ss.png" alt="Screenshot 2" width="150"/></td>
+    <td><img src="./assets/3-ss.png" alt="Screenshot 3" width="150"/></td>
+    <td><img src="./assets/4-ss.png" alt="Screenshot 4" width="150"/></td>
+    <td><img src="./assets/5-ss.png" alt="Screenshot 5" width="150"/></td>
+  </tr>
+  <tr>
+    <td><img src="./assets/6-ss.png" alt="Screenshot 6" width="150"/></td>
+    <td><img src="./assets/7-ss.png" alt="Screenshot 7" width="150"/></td>
+    <td><img src="./assets/8-ss.png" alt="Screenshot 8" width="150"/></td>
+    <td><img src="./assets/9-ss.png" alt="Screenshot 9" width="150"/></td>
+    <td><img src="./assets/10-ss.png" alt="Screenshot 10" width="150"/></td>
+  </tr>
+</table>
+
 ## ✨ Features
 
 ### 🏠 Dashboard
