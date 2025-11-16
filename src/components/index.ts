@@ -9,6 +9,7 @@ export { TextInput } from './common/TextInput';
 export { SearchBar } from './common/SearchBar';
 export { FilterButton } from './common/FilterButton';
 export { FAB } from './common/FAB';
+export { CategorySelector } from './common/CategorySelector';
 
 // Section Components
 export { BalanceCard } from './sections/BalanceCard';

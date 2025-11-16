@@ -14,8 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography, shadows } from '@/theme';
-import { Button } from '@/components/common/Button';
-import { TextInput } from '@/components/common/TextInput';
+import { CategorySelector } from '@/components/common/CategorySelector';
 import type { Transaction, Database } from '@/types/database';
 
 interface EditTransactionModalProps {
@@ -47,7 +46,6 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
   const [type, setType] = useState<'income' | 'expense'>('expense');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('Grocery');
-  const [title, setTitle] = useState('');
   const [note, setNote] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -57,7 +55,6 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       setType(transaction.type);
       setAmount(transaction.amount.toString());
       setCategory(transaction.category);
-      setTitle(transaction.title);
       setNote(transaction.note || '');
       setDate(transaction.date);
     }
@@ -70,17 +67,13 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       newErrors.amount = 'Amount must be greater than 0';
     }
 
-    if (!title.trim()) {
-      newErrors.title = 'Title is required';
-    }
-
     if (!category) {
       newErrors.category = 'Category is required';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [amount, title, category]);
+  }, [amount, category]);
 
   const handleSubmit = useCallback(() => {
     if (!validate() || !transaction) return;
@@ -89,14 +82,14 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       type,
       amount: parseFloat(amount),
       category,
-      title,
+      title: category, // Use category as title
       note: note.trim() || null,
       date,
     };
 
     onUpdate(transaction.id, updatedTransaction);
     onClose();
-  }, [validate, transaction, type, amount, category, title, note, date, onUpdate, onClose]);
+  }, [validate, transaction, type, amount, category, note, date, onUpdate, onClose]);
 
   if (!transaction) return null;
 
@@ -106,38 +99,43 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
         <View style={styles.modalContainer}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Edit Transaction</Text>
+            <Text style={styles.title}>Edit Transaction</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Ionicons name="close" size={24} color={colors.text.primary} />
             </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-            {/* Type Selector */}
+            {/* Transaction Type */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Type</Text>
-              <View style={styles.typeContainer}>
+              <View style={styles.transactionTypeContainer}>
                 <TouchableOpacity
-                  style={[styles.typeButton, type === 'expense' && styles.typeButtonActive]}
+                  style={[
+                    styles.transactionTypeButton,
+                    type === 'expense' && styles.transactionTypeButtonActive,
+                  ]}
                   onPress={() => setType('expense')}
                 >
                   <Text
                     style={[
-                      styles.typeButtonText,
-                      type === 'expense' && styles.typeButtonTextActive,
+                      styles.transactionTypeText,
+                      type === 'expense' && styles.transactionTypeTextActive,
                     ]}
                   >
                     Expense
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.typeButton, type === 'income' && styles.typeButtonActive]}
+                  style={[
+                    styles.transactionTypeButton,
+                    type === 'income' && styles.transactionTypeButtonActive,
+                  ]}
                   onPress={() => setType('income')}
                 >
                   <Text
                     style={[
-                      styles.typeButtonText,
-                      type === 'income' && styles.typeButtonTextActive,
+                      styles.transactionTypeText,
+                      type === 'income' && styles.transactionTypeTextActive,
                     ]}
                   >
                     Income
@@ -149,13 +147,13 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
             {/* Amount */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Amount</Text>
-              <View style={styles.amountInputContainer}>
+              <View style={styles.amountContainer}>
                 <Text style={styles.currencySymbol}>$</Text>
                 <RNTextInput
-                  style={[styles.amountInput, errors.amount && styles.inputError]}
+                  style={styles.amountInput}
                   value={amount}
                   onChangeText={setAmount}
-                  placeholder="0.00"
+                  placeholder="540.00"
                   placeholderTextColor={colors.text.tertiary}
                   keyboardType="decimal-pad"
                 />
@@ -163,86 +161,51 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
               {errors.amount && <Text style={styles.errorText}>{errors.amount}</Text>}
             </View>
 
-            {/* Title */}
-            <View style={styles.section}>
-              <TextInput
-                label="Title"
-                value={title}
-                onChangeText={setTitle}
-                placeholder="Enter transaction title"
-                error={errors.title}
-              />
-            </View>
-
             {/* Category */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Category</Text>
-              <View style={styles.categoryGrid}>
-                {CATEGORIES.map(cat => (
-                  <TouchableOpacity
-                    key={cat.id}
-                    style={[
-                      styles.categoryButton,
-                      category === cat.id && styles.categoryButtonActive,
-                    ]}
-                    onPress={() => setCategory(cat.id)}
-                  >
-                    <Ionicons
-                      name={cat.icon as keyof typeof Ionicons.glyphMap}
-                      size={20}
-                      color={category === cat.id ? colors.primary : colors.text.tertiary}
-                    />
-                    <Text
-                      style={[
-                        styles.categoryButtonText,
-                        category === cat.id && styles.categoryButtonTextActive,
-                      ]}
-                    >
-                      {cat.name}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+              <CategorySelector
+                categories={CATEGORIES}
+                selectedCategory={category}
+                onSelect={setCategory}
+                placeholder="Choose category"
+              />
               {errors.category && <Text style={styles.errorText}>{errors.category}</Text>}
             </View>
 
             {/* Date */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Date</Text>
-              <View style={styles.dateButton}>
-                <Ionicons name="calendar-outline" size={20} color={colors.text.secondary} />
-                <Text style={styles.dateText}>{date}</Text>
+              <View style={styles.datePickerButton}>
+                <Text style={styles.datePickerValue}>{date}</Text>
+                <Ionicons name="calendar-outline" size={20} color={colors.text.tertiary} />
               </View>
             </View>
 
             {/* Note */}
-            <View style={styles.section}>
-              <TextInput
-                label="Note (Optional)"
+            <View style={[styles.section, styles.lastSection]}>
+              <Text style={styles.sectionTitle}>Note</Text>
+              <RNTextInput
+                style={styles.noteInput}
                 value={note}
                 onChangeText={setNote}
-                placeholder="Add a note"
+                placeholder="Write a note here"
+                placeholderTextColor={colors.text.tertiary}
                 multiline
-                numberOfLines={3}
-                style={styles.noteInput}
+                numberOfLines={4}
+                textAlignVertical="top"
               />
             </View>
           </ScrollView>
 
           {/* Actions */}
           <View style={styles.actions}>
-            <Button
-              title="Cancel"
-              variant="secondary"
-              onPress={onClose}
-              style={styles.actionButton}
-            />
-            <Button
-              title="Save Changes"
-              variant="primary"
-              onPress={handleSubmit}
-              style={styles.actionButton}
-            />
+            <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.saveButton} onPress={handleSubmit}>
+              <Text style={styles.saveButtonText}>Save</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -251,65 +214,40 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
 };
 
 const styles = StyleSheet.create({
-  actionButton: {
-    flex: 1,
-  },
   actions: {
-    borderTopColor: colors.border,
-    borderTopWidth: 1,
     flexDirection: 'row',
     gap: spacing.md,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.lg,
   },
+  amountContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: spacing.md,
+  },
   amountInput: {
     color: colors.text.primary,
-    flex: 1,
     fontSize: typography.fontSize['4xl'],
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: typography.fontWeight.semibold,
+    includeFontPadding: false,
     padding: 0,
     textAlign: 'center',
   },
-  amountInputContainer: {
+  cancelButton: {
     alignItems: 'center',
-    backgroundColor: colors.background.secondary,
-    borderColor: colors.border,
-    borderRadius: borderRadius.md,
+    borderColor: colors.primaryText,
+    borderRadius: 58,
     borderWidth: 1,
-    flexDirection: 'row',
+    flex: 1,
+    height: 44,
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing['2xl'],
   },
-  categoryButton: {
-    alignItems: 'center',
-    backgroundColor: colors.white,
-    borderColor: colors.border,
-    borderRadius: borderRadius.md,
-    borderWidth: 1,
-    flexDirection: 'row',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    width: '48%',
-  },
-  categoryButtonActive: {
-    backgroundColor: colors.background.activeTab,
-    borderColor: colors.primary,
-  },
-  categoryButtonText: {
-    color: colors.text.tertiary,
+  cancelButtonText: {
+    color: colors.primaryText,
     fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.medium,
-  },
-  categoryButtonTextActive: {
-    color: colors.primary,
     fontWeight: typography.fontWeight.semibold,
-  },
-  categoryGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
   },
   closeButton: {
     padding: spacing.xs,
@@ -321,24 +259,25 @@ const styles = StyleSheet.create({
   currencySymbol: {
     color: colors.text.primary,
     fontSize: typography.fontSize['4xl'],
-    fontWeight: typography.fontWeight.bold,
-    marginRight: spacing.sm,
+    fontWeight: typography.fontWeight.semibold,
+    includeFontPadding: false,
+    marginRight: spacing.xs,
   },
-  dateButton: {
+  datePickerButton: {
     alignItems: 'center',
     backgroundColor: colors.white,
     borderColor: colors.border,
     borderRadius: borderRadius.md,
     borderWidth: 1,
     flexDirection: 'row',
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    height: 48,
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.md,
   },
-  dateText: {
+  datePickerValue: {
     color: colors.text.primary,
-    fontSize: typography.fontSize.base,
-    fontWeight: typography.fontWeight.medium,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.regular,
   },
   errorText: {
     color: colors.danger,
@@ -354,64 +293,91 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.lg,
   },
-  headerTitle: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.xl,
-    fontWeight: typography.fontWeight.semibold,
-  },
-  inputError: {
-    borderColor: colors.danger,
+  lastSection: {
+    marginBottom: spacing.md,
   },
   modalContainer: {
     backgroundColor: colors.white,
-    borderTopLeftRadius: borderRadius.lg,
-    borderTopRightRadius: borderRadius.lg,
-    height: '90%',
+    borderTopLeftRadius: 26,
+    borderTopRightRadius: 26,
+    height: '70%',
     marginTop: 'auto',
     ...shadows.card,
   },
   noteInput: {
-    height: 80,
+    backgroundColor: colors.white,
+    borderColor: colors.border,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    color: colors.text.primary,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.regular,
+    height: 92,
+    padding: spacing.md,
+    textAlignVertical: 'top',
   },
   overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(9, 36, 73, 0.21)',
     flex: 1,
     justifyContent: 'flex-end',
+  },
+  saveButton: {
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    borderRadius: 58,
+    flex: 1,
+    height: 44,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+  },
+  saveButtonText: {
+    color: colors.white,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.semibold,
   },
   section: {
     marginBottom: spacing['2xl'],
   },
   sectionTitle: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.base,
+    color: colors.text.secondary,
+    fontSize: typography.fontSize.xs,
     fontWeight: typography.fontWeight.semibold,
     marginBottom: spacing.md,
+    marginTop: spacing.sm,
+    textTransform: 'uppercase',
   },
-  typeButton: {
+  title: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.bold,
+  },
+  transactionTypeButton: {
     alignItems: 'center',
     backgroundColor: colors.white,
-    borderColor: colors.border,
+    borderColor: 'rgba(0,0,0,0.1)',
     borderRadius: borderRadius.pill,
     borderWidth: 1,
     flex: 1,
-    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
   },
-  typeButtonActive: {
+  transactionTypeButtonActive: {
     backgroundColor: colors.background.activeTab,
     borderColor: colors.primary,
   },
-  typeButtonText: {
-    color: colors.text.tertiary,
-    fontSize: typography.fontSize.base,
-    fontWeight: typography.fontWeight.medium,
+  transactionTypeContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: spacing.sm,
   },
-  typeButtonTextActive: {
+  transactionTypeText: {
+    color: colors.primaryText,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.regular,
+  },
+  transactionTypeTextActive: {
     color: colors.primary,
     fontWeight: typography.fontWeight.semibold,
-  },
-  typeContainer: {
-    flexDirection: 'row',
-    gap: spacing.md,
   },
 });
 
