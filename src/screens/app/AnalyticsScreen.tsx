@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, shadows, typography } from '@/theme';
 import { ScreenHeader, Text, LoadingSpinner } from '@/components';
 import { useAnalyticsStore } from '@/store/analyticsStore';
+import { useUserStore } from '@/store/userStore';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CHART_WIDTH = SCREEN_WIDTH - spacing.lg * 2;
@@ -25,6 +26,7 @@ const CHART_HEIGHT = 220;
 const CHART_PADDING = 40;
 
 export default function AnalyticsScreen() {
+  const user = useUserStore(state => state.user);
   const {
     totalIncome,
     totalExpense,
@@ -67,14 +69,14 @@ export default function AnalyticsScreen() {
     }).format(amount);
   };
 
-  const getTimeRangeLabel = () => {
+  const getTimeRangeLabel = (range?: string) => {
     const labels: { [key: string]: string } = {
+      today: 'Today',
+      thisWeek: 'This Week',
       thisMonth: 'This Month',
-      lastMonth: 'Last Month',
-      last3Months: 'Last 3 Months',
       thisYear: 'This Year',
     };
-    return labels[timeRange] || 'This Month';
+    return labels[range || timeRange] || 'This Month';
   };
 
   const renderSpendingTrendChart = () => {
@@ -316,14 +318,16 @@ export default function AnalyticsScreen() {
         colors={[colors.background.gradientStart, colors.background.gradientEnd]}
         style={styles.gradient}
       >
-        <ScreenHeader
-          title="Analytics"
-          onAvatarPress={handleAvatarPress}
-          onNotificationPress={handleNotificationPress}
-          showBackButton={false}
-        />
+      <ScreenHeader
+        userName="Analytics"
+        avatarUrl={user?.avatar_url}
+        hasNotification={false}
+        onAvatarPress={handleAvatarPress}
+        onNotificationPress={handleNotificationPress}
+        hideGreeting
+      />
 
-        <ScrollView
+      <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.contentContainer}
           showsVerticalScrollIndicator={false}
@@ -347,7 +351,7 @@ export default function AnalyticsScreen() {
           {/* Time Range Dropdown */}
           {showTimeRangeDropdown && (
             <View style={styles.timeRangeDropdown}>
-              {['thisMonth', 'lastMonth', 'last3Months', 'thisYear'].map(range => (
+              {['today', 'thisWeek', 'thisMonth', 'thisYear'].map(range => (
                 <TouchableOpacity
                   key={range}
                   style={styles.timeRangeOption}
@@ -363,7 +367,7 @@ export default function AnalyticsScreen() {
                       timeRange === range && styles.timeRangeOptionTextActive,
                     ]}
                   >
-                    {getTimeRangeLabel()}
+                    {getTimeRangeLabel(range)}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -376,8 +380,10 @@ export default function AnalyticsScreen() {
               <View style={styles.statIconContainer}>
                 <Ionicons name="arrow-down-outline" size={16} color={colors.success} />
               </View>
-              <Text style={styles.statLabel}>Total Income</Text>
-              <Text style={styles.statValue}>{formatCurrency(totalIncome)}</Text>
+              <View style={styles.statContent}>
+                <Text style={styles.statLabel}>Total Income</Text>
+                <Text style={styles.statValue}>{formatCurrency(totalIncome)}</Text>
+              </View>
             </View>
 
             <View style={styles.statDivider} />
@@ -386,8 +392,10 @@ export default function AnalyticsScreen() {
               <View style={styles.statIconContainer}>
                 <Ionicons name="arrow-up-outline" size={16} color={colors.danger} />
               </View>
-              <Text style={styles.statLabel}>Total Expense</Text>
-              <Text style={styles.statValue}>{formatCurrency(totalExpense)}</Text>
+              <View style={styles.statContent}>
+                <Text style={styles.statLabel}>Total Expense</Text>
+                <Text style={styles.statValue}>{formatCurrency(totalExpense)}</Text>
+              </View>
             </View>
 
             <View style={styles.statDivider} />
@@ -396,8 +404,10 @@ export default function AnalyticsScreen() {
               <View style={styles.statIconContainer}>
                 <Ionicons name="wallet-outline" size={16} color={colors.info} />
               </View>
-              <Text style={styles.statLabel}>Net Balance</Text>
-              <Text style={styles.statValue}>{formatCurrency(netBalance)}</Text>
+              <View style={styles.statContent}>
+                <Text style={styles.statLabel}>Net Balance</Text>
+                <Text style={styles.statValue}>{formatCurrency(netBalance)}</Text>
+              </View>
             </View>
           </View>
 
@@ -558,14 +568,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statCard: {
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingVertical: spacing.md,
+  },
+  statContent: {
     flex: 1,
-    paddingVertical: spacing.sm,
+    marginLeft: spacing.md,
   },
   statDivider: {
     backgroundColor: colors.border,
-    height: '100%',
-    width: 1,
+    height: 1,
+    width: '100%',
   },
   statIconContainer: {
     alignItems: 'center',
@@ -591,10 +605,11 @@ const styles = StyleSheet.create({
   statsContainer: {
     backgroundColor: colors.white,
     borderRadius: borderRadius.lg,
-    flexDirection: 'row',
+    flexDirection: 'column',
     marginHorizontal: spacing.lg,
     marginTop: spacing.md,
-    padding: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
     ...shadows.card,
   },
   timeRangeDropdown: {

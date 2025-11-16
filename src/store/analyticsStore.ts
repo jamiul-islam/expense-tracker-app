@@ -65,16 +65,21 @@ export const useAnalyticsStore = create<AnalyticsState>((set, get) => ({
       let startDate: Date;
 
       switch (range) {
-        case 'lastMonth':
-          startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        case 'today':
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
           break;
-        case 'last3Months':
-          startDate = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+        case 'thisWeek': {
+          const dayOfWeek = now.getDay();
+          const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Adjust when day is Sunday
+          startDate = new Date(now.getFullYear(), now.getMonth(), diff);
+          break;
+        }
+        case 'thisMonth':
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
           break;
         case 'thisYear':
           startDate = new Date(now.getFullYear(), 0, 1);
           break;
-        case 'thisMonth':
         default:
           startDate = new Date(now.getFullYear(), now.getMonth(), 1);
           break;
