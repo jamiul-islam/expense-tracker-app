@@ -11,8 +11,10 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput as RNTextInput,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { colors, spacing, borderRadius, typography, shadows } from '@/theme';
 import { CategorySelector } from '@/components/common/CategorySelector';
 import type { Database } from '@/types/database';
@@ -44,7 +46,8 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('Grocery');
   const [note, setNote] = useState('');
-  const [date] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = useCallback(() => {
@@ -92,9 +95,29 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
     setNote('');
     setType('expense');
     setCategory('Grocery');
+    setDate(new Date().toISOString().split('T')[0]);
+    setShowDatePicker(false);
     setErrors({});
     onClose();
   }, [onClose]);
+
+  const handleDateChange = useCallback((event: { type: string }, selectedDate?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+    if (selectedDate) {
+      setDate(selectedDate.toISOString().split('T')[0]);
+    }
+  }, []);
+
+  const formatDateDisplay = useCallback((dateString: string) => {
+    const dateObj = new Date(dateString);
+    return dateObj.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }, []);
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
@@ -179,10 +202,22 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
             {/* Date */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Date</Text>
-              <View style={styles.datePickerButton}>
-                <Text style={styles.datePickerValue}>{date}</Text>
+              <TouchableOpacity
+                style={styles.datePickerButton}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Text style={styles.datePickerValue}>{formatDateDisplay(date)}</Text>
                 <Ionicons name="calendar-outline" size={20} color={colors.text.tertiary} />
-              </View>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={new Date(date)}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={handleDateChange}
+                  maximumDate={new Date()}
+                />
+              )}
             </View>
 
             {/* Note */}
