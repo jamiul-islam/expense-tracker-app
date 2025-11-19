@@ -117,6 +117,8 @@ The app follows a pixel-perfect design system inspired by modern fintech applica
 
 ## 📦 Installation
 
+**🚀 New to the project? Start with the [Quick Setup Guide](./SETUP_GUIDE.md) for a streamlined 15-minute setup!**
+
 ### Prerequisites
 - Node.js (v18 or higher)
 - Bun (v1.0 or higher) or npm/yarn
@@ -144,7 +146,7 @@ yarn install
 
 ### Environment Setup
 
-1. Create a `.env.local` file in the root directory:
+1. Create a `.env.local` file in the root directory (see [`.env.example`](./.env.example) for template):
 ```env
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -159,78 +161,143 @@ APP_ENV=development
 
 ### Database Setup
 
-Run the following SQL migrations in your Supabase SQL Editor:
+The project includes complete SQL migration files in the `supabase/migrations/` folder. Follow these steps to set up your database:
+
+#### Step 1: Create a Supabase Project
+
+1. Go to [https://supabase.com/dashboard](https://supabase.com/dashboard)
+2. Click "New Project"
+3. Fill in project details:
+   - **Name**: Tranzo (or your preferred name)
+   - **Database Password**: Create a strong password (save this!)
+   - **Region**: Choose closest to your location
+4. Click "Create new project" and wait for setup to complete
+
+#### Step 2: Get Your Credentials
+
+1. In your project dashboard, click on the **Settings** icon (⚙️)
+2. Go to **API** section
+3. Copy the following values:
+   - **Project URL** (`EXPO_PUBLIC_SUPABASE_URL`)
+   - **Project API Key (anon public)** (`EXPO_PUBLIC_SUPABASE_ANON_KEY`)
+4. Update your `.env.local` file with these credentials
+
+#### Step 3: Run Database Migrations
+
+Open **SQL Editor** in your Supabase dashboard and run the following migration files **in order**:
+
+##### 1️⃣ Initial Schema (REQUIRED)
+- Navigate to `supabase/migrations/20241119000001_initial_schema.sql`
+- Copy the entire file content
+- Paste into Supabase SQL Editor
+- Click **RUN** button
+- Wait for "Success. No rows returned" message
+
+This creates:
+- ✅ `public.users` table (user profiles)
+- ✅ `public.transactions` table (financial transactions)
+- ✅ `public.categories` table (transaction categories)
+- ✅ Indexes for performance
+- ✅ Automatic `updated_at` triggers
+
+##### 2️⃣ Row Level Security (REQUIRED)
+- Navigate to `supabase/migrations/20241119000002_row_level_security.sql`
+- Copy and run in SQL Editor
+
+This creates:
+- ✅ RLS policies for data isolation
+- ✅ User-specific data access rules
+- ✅ Secure permissions
+
+##### 3️⃣ Seed Categories (REQUIRED)
+- Navigate to `supabase/migrations/20241119000003_seed_categories.sql`
+- Copy and run in SQL Editor
+
+This adds:
+- ✅ 14 expense categories (Food, Transport, Shopping, etc.)
+- ✅ 8 income categories (Salary, Freelance, etc.)
+- ✅ 2 general categories (Transfer, Adjustment)
+
+##### 4️⃣ Auth Triggers (REQUIRED)
+- Navigate to `supabase/migrations/20241119000004_auth_triggers.sql`
+- Copy and run in SQL Editor
+
+This creates:
+- ✅ Auto-create user profile on signup
+- ✅ Sync profile updates from auth
+- ✅ Automatic data cleanup
+
+##### 5️⃣ Helper Functions (OPTIONAL but RECOMMENDED)
+- Navigate to `supabase/migrations/20241119000005_helper_functions.sql`
+- Copy and run in SQL Editor
+
+This adds:
+- ✅ Balance calculation functions
+- ✅ Monthly summary functions
+- ✅ Category breakdown analytics
+- ✅ Spending trend calculations
+
+#### Step 4: Verify Setup
+
+Run this verification query in SQL Editor:
 
 ```sql
--- Create users table (extends Supabase auth.users)
-CREATE TABLE public.users (
-  id UUID REFERENCES auth.users PRIMARY KEY,
-  email TEXT UNIQUE NOT NULL,
-  full_name TEXT,
-  avatar_url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- Check tables exist
+SELECT table_name 
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+ORDER BY table_name;
 
--- Create transactions table
-CREATE TABLE public.transactions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
-  type TEXT CHECK (type IN ('income', 'expense')) NOT NULL,
-  amount DECIMAL(10, 2) NOT NULL,
-  category TEXT NOT NULL,
-  title TEXT NOT NULL,
-  note TEXT,
-  date DATE NOT NULL DEFAULT CURRENT_DATE,
-  status TEXT CHECK (status IN ('completed', 'pending', 'failed')) DEFAULT 'completed',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- Should show: categories, transactions, users
 
--- Create categories table (optional)
-CREATE TABLE public.categories (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name TEXT NOT NULL,
-  icon TEXT,
-  color TEXT,
-  type TEXT CHECK (type IN ('income', 'expense', 'both'))
-);
+-- Check categories count
+SELECT COUNT(*) as total_categories FROM public.categories;
+-- Should return: 24
 
--- Enable Row Level Security
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
-
--- Create policies
-CREATE POLICY "Users can view own profile"
-  ON public.users FOR SELECT
-  USING (auth.uid() = id);
-
-CREATE POLICY "Users can update own profile"
-  ON public.users FOR UPDATE
-  USING (auth.uid() = id);
-
-CREATE POLICY "Users can view own transactions"
-  ON public.transactions FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can insert own transactions"
-  ON public.transactions FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can update own transactions"
-  ON public.transactions FOR UPDATE
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete own transactions"
-  ON public.transactions FOR DELETE
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Everyone can view categories"
-  ON public.categories FOR SELECT
-  TO authenticated
-  USING (true);
+-- Check RLS is enabled
+SELECT schemaname, tablename, rowsecurity 
+FROM pg_tables 
+WHERE schemaname = 'public';
+-- All should have rowsecurity = true
 ```
+
+#### Step 5: Configure Authentication
+
+1. In Supabase Dashboard, go to **Authentication** → **Providers**
+2. Enable **Email** provider
+3. **Disable** "Confirm email" (we're using OTP)
+4. Click **Save**
+
+5. Go to **Authentication** → **Email Templates**
+6. Customize the **Magic Link** template if desired
+
+#### Alternative: Quick Setup (Single Query)
+
+If you prefer to run all migrations at once, you can combine them:
+
+1. Open SQL Editor in Supabase Dashboard
+2. Copy all 5 migration files in order into one query
+3. Run the combined query
+
+**Note**: This is faster but makes debugging harder if there are errors.
+
+#### Troubleshooting
+
+**Error: "relation already exists"**
+- Migration already run - safe to ignore
+- Or drop tables and re-run (see `supabase/README.md`)
+
+**Error: "permission denied"**
+```sql
+GRANT USAGE ON SCHEMA public TO authenticated;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
+```
+
+**Error: "foreign key violation"**
+- Run migrations in order (1 → 2 → 3 → 4 → 5)
+- Don't skip migration files
+
+For detailed migration documentation, see [`supabase/README.md`](./supabase/README.md)
 
 ---
 
